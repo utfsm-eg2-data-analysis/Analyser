@@ -1,6 +1,13 @@
 #ifndef TIDENTIFICATOR_INLINES_H
 #define TIDENTIFICATOR_INLINES_H
+extern const Double_t kMeanFePar[6][3];
+extern const Double_t kSigmaFePar[6][2];
 
+extern const Double_t kMeanCPar[6][3];
+extern const Double_t kSigmaCPar[6][2];
+
+extern const Double_t kMeanPbPar[6][3];
+extern const Double_t kSigmaPbPar[6][2];
 
 inline Float_t TIdentificator::NEvent()
 {
@@ -427,4 +434,81 @@ inline Double_t TIdentificator::SCStatus(Int_t k)
     }
 }
 
+inline Float_t TIdentificator::XEC(Int_t k)
+{
+    fEVNT = (TEVNTClass *) fCT->GetBankRow("EVNT", k);
+
+    if (fEVNT->Ecstat >= 1) {
+        Int_t ec_stat= fEVNT->Ecstat - 1;
+        fECPB = (TECPBClass *) fCT->GetBankRow("ECPB", ec_stat);
+        return fECPB->X;
+    } else {
+        return kGOOD;
+    }
+}
+
+inline Float_t TIdentificator::YEC(Int_t k)
+{
+    fEVNT = (TEVNTClass *) fCT->GetBankRow("EVNT", k);
+
+    if (fEVNT->Ecstat >= 1) {
+        Int_t ec_stat= fEVNT->Ecstat - 1;
+        fECPB = (TECPBClass *) fCT->GetBankRow("ECPB", ec_stat);
+        return fECPB->Y;
+    } else {
+        return kGOOD;
+    }
+}
+
+inline Float_t TIdentificator::ZEC(Int_t k)
+{
+    fEVNT = (TEVNTClass *) fCT->GetBankRow("EVNT", k);
+
+    if (fEVNT->Ecstat >= 1) {
+        Int_t ec_stat= fEVNT->Ecstat - 1;
+        fECPB = (TECPBClass *) fCT->GetBankRow("ECPB", ec_stat);
+        return fECPB->Z;
+    } else {
+        return kGOOD;
+    }
+}
+
+inline Float_t TIdentificator::TimeEC(Int_t k)
+{
+    fEVNT = (TEVNTClass *) fCT->GetBankRow("EVNT", k);
+
+    if (fEVNT->Ecstat >= 1) {
+        Int_t ec_stat= fEVNT->Ecstat - 1;
+        fECPB = (TECPBClass *) fCT->GetBankRow("ECPB", ec_stat);
+        return fECPB->Time;
+    } else {
+        return kGOOD;
+    }
+}
+
+inline Float_t TIdentificator::PathEC(Int_t k)
+{
+    fEVNT = (TEVNTClass *) fCT->GetBankRow("EVNT", k);
+
+    if (fEVNT->Ecstat >= 1) {
+        Int_t ec_stat= fEVNT->Ecstat - 1;
+        fECPB = (TECPBClass *) fCT->GetBankRow("ECPB", ec_stat);
+        return fECPB->Path;
+    } else {
+        return kGOOD;
+    }
+}
+
+inline bool TIdentificator::SampFracCheck()
+{
+  bool ret=false;
+  Double_t E=TMath::Max(Etot(0),Ein(0)+Eout(0));
+  Double_t p=Momentum(0);
+  Int_t s = Sector(0);
+  Double_t MeanE = kMeanFePar[s][0] + kMeanFePar[s][1]*p + kMeanFePar[s][2]*p*p;
+  Double_t SigmaE = TMath::Sqrt(kSigmaFePar[s][0]*kSigmaFePar[s][0] + kSigmaFePar[s][1]*kSigmaFePar[s][1]/p);
+  if (TMath::Abs( E/p - MeanE )< 2.5*SigmaE)
+    ret=true;
+  return ret;
+}
 #endif

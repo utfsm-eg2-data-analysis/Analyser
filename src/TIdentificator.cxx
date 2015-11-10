@@ -73,6 +73,51 @@ const Double_t kFidPar1High1PiPlus[6] = {  0.442034 ,  0.201149 ,  1.27519 ,  1.
 const Double_t kFidPar1High2PiPlus[6] = { -2.       , -0.179631 , -2.      , -1.89436 , -2.       , -2.      };
 const Double_t kFidPar1High3PiPlus[6] = {  1.02806  ,  1.6      ,  0.5     ,  1.03961 ,  0.815707 ,  1.31013 };
 
+// sampling fraction correction, electrons.
+const Double_t kMeanFePar[6][3]={{0.222404,0.0222688,-0.0024153},
+                       {0.234623,0.0194985,-0.00208357},
+                       {0.252287,0.024248,-0.00338846},
+                       {0.250946,0.0208409,-0.00326824},
+                       {0.271956,0.0118487,-0.00187084},
+                       {0.252613,0.022819,-0.00311242}};
+
+const Double_t kSigmaFePar[6][2]={{9.23027e-03,2.98343e-02},
+                       {8.66367e-03,3.08858e-02},
+                       {1.07826e-02,2.63854e-02},
+                       {7.22581e-03,2.98809e-02},
+                       {1.84073e-02,3.48029e-02},
+                       {4.11461e-03,3.55081e-02}};
+
+
+const Double_t kMeanCPar[6][3]={{0.252164,0.0122263,-0.000793937},
+                          {0.278574,0.0187482,-0.00238217},
+                          {0.262079,0.0230685,-0.00354741},
+                          {0.251108,0.0201568,-0.00332367},
+                          {0.263396,0.00955238,-0.00102038},
+                          {0.255245,0.0232659,-0.00304798}};
+
+const Double_t kSigmaCPar[6][2]={{9.55113e-03,3.40672e-02},
+                       {1.39889e-02,3.74682e-02},
+                       {9.32762e-03,2.90046e-02},
+                       {8.21055e-03,2.98893e-02},
+                       {2.25684e-02,3.06508e-02},
+                       {1.17254e-02,3.64221e-02}};
+
+const Double_t kMeanPbPar[6][3]={{0.253431,0.0138251,-0.0014016},
+                       {0.249059,0.0147784,-0.00148693},
+                       {0.254573,0.022589,-0.00305686},
+                       {0.255589,0.0190419,-0.00305263},
+                       {0.276739,0.0111585,-0.00175784},
+                       {0.262587,0.0191659,-0.0026264}};
+
+const Double_t kSigmaPbPar[6][2]={{7.67408e-03,3.54391e-02},
+                       {7.52798e-03,3.38371e-02},
+                       {8.13241e-03,2.77300e-02},
+                       {7.20303e-03,3.03627e-02},
+                       {1.80841e-02,3.53020e-02},
+                       {1.99220e-03,3.76172e-02}};
+
+
 ClassImp(TIdentificator);
 
 TIdentificator::TIdentificator(TClasTool *CT)
@@ -885,6 +930,88 @@ Bool_t TIdentificator::PionVertTarg(Int_t k)
 
     return vertex_cut_pion;
 }
+
+TVector3 *TIdentificator::GetCorrectedVert()
+{
+//Electrons.
+      TVector3 RotatedVertPos(X(0),Y(0),Z(0)); //vx, xy, vz from EVNT
+      TVector3 RotatedVertDir(Px(0),Py(0),Pz(0));//px, py, pz from EVNT
+      TVector3 TargetPos(0.043,-0.33,0);
+      TVector3 *V_corr = new TVector3();
+      Float_t sect = Sector(0); 
+      RotatedVertPos.RotateZ(-TMath::DegToRad()*60.*sect);
+      RotatedVertDir.RotateZ(-TMath::DegToRad()*60.*sect);
+      TargetPos.RotateZ(-TMath::DegToRad()*60.*sect);
+      Float_t ShiftLength = (TargetPos.X()-RotatedVertPos.X())/RotatedVertDir.X();
+      RotatedVertDir = ShiftLength*RotatedVertDir;
+      RotatedVertPos = RotatedVertPos+RotatedVertDir;
+      V_corr->SetX((RotatedVertPos-TargetPos).X());
+      V_corr->SetY((RotatedVertPos-TargetPos).Y());
+      V_corr->SetZ(RotatedVertPos.Z());
+      return V_corr;
+}
+
+TVector3 *TIdentificator::XYZToUVW(TVector3 *xyz){
+  // Converts x,y,z EC hit in CLAS coordinate system
+  // into u,v,w distances of the EC hit.
+
+  Float_t ex=0.;
+  Float_t wy=0.;
+  Float_t zd=0.;
+  Float_t yu=0.;
+  Float_t ve=0.;
+  Float_t wu=0.;
+  Float_t xi=0.; 
+  Float_t yi=0.; 
+  Float_t zi=0.;
+  Float_t ec_phy = 0.;  
+  Float_t phy = 0.;
+  Float_t rot[3][3];
+
+  // Parameters
+  Float_t ec_the = 0.4363323;
+  Float_t ylow = -182.974;
+  Float_t yhi = 189.956;
+  Float_t tgrho = 1.95325; 
+  Float_t sinrho = 0.8901256; 
+  Float_t cosrho = 0.455715;
+
+  // Variables
+  ex = xyz->X();
+  wy = xyz->Y();
+  zd = xyz->Z();
+  
+  phy = TMath::ATan2(wy,ex)*57.29578;
+  if(phy<0.){phy = phy + 360;}
+  phy = phy+30.;
+  if(phy>360.){phy = phy-360.;}
+
+  ec_phy = ((Int_t) (phy/60.))*1.0471975;
+
+  rot[0][0] = TMath::Cos(ec_the)*TMath::Cos(ec_phy);
+  rot[0][1] = -TMath::Sin(ec_phy);
+  rot[0][2] = TMath::Sin(ec_the)*TMath::Cos(ec_phy);
+  rot[1][0] = TMath::Cos(ec_the)*TMath::Sin(ec_phy);
+  rot[1][1] = TMath::Cos(ec_phy);
+  rot[1][2] = TMath::Sin(ec_the)*TMath::Sin(ec_phy);
+  rot[2][0] = -TMath::Sin(ec_the);
+  rot[2][1] = 0.;
+  rot[2][2] = TMath::Cos(ec_the);
+
+  yi = ex*rot[0][0]+wy*rot[1][0]+zd*rot[2][0];
+  xi = ex*rot[0][1]+wy*rot[1][1]+zd*rot[2][1];
+  zi = ex*rot[0][2]+wy*rot[1][2]+zd*rot[2][2];
+  zi = zi-510.32 ;
+
+  yu = (yi-ylow)/sinrho;
+  ve = (yhi-ylow)/tgrho - xi + (yhi-yi)/tgrho;
+  wu = ((yhi-ylow)/tgrho + xi + (yhi-yi)/tgrho)/2./cosrho;
+
+  TVector3 * result3= new TVector3(yu,ve,wu);
+
+  return result3;
+}
+
 
 
 #include "Categorize.C"

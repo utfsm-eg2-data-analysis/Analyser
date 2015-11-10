@@ -17,7 +17,14 @@ TString TIdentificator::GetCategorization(Int_t k)
                     StatCC(0) > 0 && StatSC(0) > 0 &&
                     StatDC(0) > 0 && StatEC(0) > 0 &&
                     DCStatus(0) > 0 && SCStatus(0) == 33 &&
-                    Nphe(0) > 25 &&
+                    Nphe(0) > (Sector(0)==0||Sector(0)==1)*25 //Added sector dependent cut. osoto_mod.
+                              +(Sector(0)==2)*26 
+                              +(Sector(0)==3)*21
+                              +(Sector(0)==4 || Sector(0)==5 )*28 &&
+                    Momentum(0)>0.75&& // Momentum triger added. osoto_mod.
+                    Ein(0)>0.06&& // Inner stack energy cut. osoto_mod.
+                    (TimeEC(0)- TimeSC(0) - (PathEC(0)-PathSC(0) )/30) < 5*0.35 &&// elapsed time between sc and ec (??). osoto_mod.
+                    SampFracCheck()&&
                     Etot(0) / 0.27 / 1.15 + 0.4 > Momentum(0) &&
                     Etot(0) / 0.27 / 1.15 - 0.2 < Momentum(0) &&
                     Ein(0) + Eout(0) > 0.8 * 0.27 * Momentum(0) &&
@@ -27,8 +34,22 @@ TString TIdentificator::GetCategorization(Int_t k)
 
 
         if (k > 0) {
-            if (Charge(k)==0 && Betta(k)>0.95 && ECStatus(k)>0)
-                partId = "photon";
+            if (Charge(k) == 0 )
+            { 
+                TVector3 *ECxyz = new TVector3(XEC(k),YEC(k),ZEC(k));
+                TVector3 *ECuvw = XYZToUVW(ECxyz);
+                if(ECuvw->X()>40 && ECuvw->X()<410 && // u coordinate in ]40,410[
+                  ECuvw->Y()<370 && // v coordinate in [0,370[
+                  ECuvw->Z()<410 && // w coordinate in [0,410[
+                  PathEC(k)/(Betta(k)*30) - PathEC(k)/30>-2.2&&
+                  PathEC(k)/(Betta(k)*30) - PathEC(k)/30<1.3&&
+                  TMath::Max(Etot(k), Ein(k)+Eout(k))/0.273>0.1
+                  )
+                  {
+                    partId = "gamma";
+                  }
+              
+            }
 
             //positive particles
             if (Charge(k) == 1 &&

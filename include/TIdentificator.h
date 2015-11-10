@@ -69,6 +69,11 @@ public:
     Double_t Ein(Int_t k);                        // inline
     Double_t Eout(Int_t k);                       // inline
     Double_t ECStatus(Int_t k);                   // inline
+    Float_t XEC(Int_t k);                         // inline // osoto add
+    Float_t YEC(Int_t k);                         // inline // osoto add
+    Float_t ZEC(Int_t k);                         // inline // osoto add
+    Float_t TimeEC(Int_t k);                      // inline // osoto add
+    Float_t PathEC(Int_t k);                      // inline // osoto add
 
     // SCPB
     Double_t PathSC(Int_t k);                     // inline
@@ -113,6 +118,8 @@ public:
 
     // Correction functions
     Double_t TimeCorr4(Double_t mass, Int_t k);
+    TVector3 *GetCorrectedVert();
+
 
 	 //Added in hayk's code
 	 //Int_t ElecVertTarg(Bool_t = 0);
@@ -143,6 +150,10 @@ public:
     Int_t ElecVertTarg();
     Int_t ElecVertTarg(Bool_t kind);
     Bool_t PionVertTarg(Int_t k);
+
+    //Other methods.
+    TVector3 *XYZToUVW(TVector3 *xyz);            //osoto add
+    bool SampFracCheck();                         // inline //osoto add 
 
 private:
     const Double_t kEbeam;    // The energy of incoming electron beam
