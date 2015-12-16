@@ -27,7 +27,7 @@ LDFLAGS   = -O2 $(ROOTLDFLAGS)
 SOFLAGS   = -Wl,-soname,$(notdir $@) -shared
 
 INCLUDES  = -I$(INC_DIR) -I$(CLASTOOL)/include
-LIBS      = -L$(CLASTOOL)/slib/Linux -lClasTool
+LIBS      = -L$(CLASTOOL)/slib/${OSNAME} -lClasTool
 
 vpath %.cxx $(SRC_DIR)
 vpath %.h $(INC_DIR)
