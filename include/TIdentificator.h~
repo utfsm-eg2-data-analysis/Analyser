@@ -126,7 +126,6 @@ public:
 
     // Particle Identification cuts
     TString GetCategorization(Int_t k);
-    TString GetCategorizationMin(Int_t k);
     TString GetCategorizationOld(Int_t k);
     TString* GetCategorization();
     void PrintCategorization();
