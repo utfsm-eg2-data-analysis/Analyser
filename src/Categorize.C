@@ -273,16 +273,13 @@ TString TIdentificator::GetCategorizationMin(Int_t k)
               partId = "low energy pion +";
           }
 
-          if (Charge(k) == 1 && number_cc != 0 && number_ec != 0 && number_sc != 0 &&
-		          StatCC(k) > 0 && StatSC(k) > 0 &&
-		          StatDC(k) > 0 && StatEC(k) > 0 &&
-		          DCStatus(k) > 0 && Nphe(k) > 25 &&
-		          Etot(k) / 0.27 + 0.4 > Momentum(k) &&
-		          Etot(k) / 0.27 - 0.4 < Momentum(k) &&
-		          Ein(k) + Eout(k) > 0.8 * 0.27 * Momentum(k) &&
-		          Ein(k) + Eout(k) < 1.2 * 0.27 * Momentum(k))
-              partId = "positron";
         }
+        if (Status(k) > 0 && Status(k) < 100&&
+            Charge(k) == 1 && number_cc != 0 && number_ec != 0 && number_sc != 0 &&
+            StatCC(k) > 0 && StatSC(k) > 0 &&
+            StatDC(k) > 0 && StatEC(k) > 0 &&
+            DCStatus(k) > 0)
+            partId = "positron";
         // Gamma ID
         if (Charge(k) == 0 )
           { 
