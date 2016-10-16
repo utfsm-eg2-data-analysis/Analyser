@@ -51,6 +51,31 @@ TString TIdentificator::GetCategorization(Int_t k)
               
             }
 
+
+	    //negative particles osoto_mod
+            if (Charge(k) == -1 &&
+		Status(k) > 0 && Status(k) < 100 &&
+		StatDC(k) > 0 && DCStatus(k) > 0)
+	      {
+		Float_t P=Momentum(k);
+		Float_t T4 =TimeCorr4(0.1396,k);
+		if (Etot(k)<0.15 && Ein(k)<0.085-0.5*Eout(k) &&
+		    ( ( (!(StatCC(k)>0 && Nphe(k)>25)) &&
+		       ( 
+			(0<P && P<=0.5 && T4>-0.87 && T4<0.63)
+			||(0.5<P && P<=1.0 && T4>-0.55 && T4<0.37)
+			||(1.0<P && P<=1.5 && T4>-0.55 && T4<0.38)
+			||(1.5<P && P<=2.0 && T4>-0.60 && T4<0.44)
+			||(2.0<P && P<=2.5 && T4>-1.00 && T4<0.45)
+			 )
+			)
+		      ||(2.5<P && P<=3.0 && T4>-1.00 && T4<0.40)
+		      || (3.0<P && T4>-2.00 && T4<0.45)
+		      )
+		    )
+		  partId = "pi-";
+	      }
+
             //positive particles
             if (Charge(k) == 1 &&
                         Status(k) > 0 && Status(k) < 100 &&
@@ -246,10 +271,13 @@ TString TIdentificator::GetCategorizationMin(Int_t k)
       if (k == 0 &&
           Status(0) > 0 &&
           Charge(0) == -1 &&
-          number_cc != 0 && number_ec != 0 && number_sc != 0 &&
+	  //number_cc != 0 &&
+	  number_ec != 0 && number_sc != 0 &&
           StatSC(0) > 0 &&
-          StatDC(0) > 0 && StatEC(0) > 0 &&
-          DCStatus(0) > 0 && ECStatus(0) > 0 && SCStatus(0)>0
+          StatDC(0) > 0 && 
+	  StatEC(0) > 0 &&
+          DCStatus(0) > 0 &&
+	  ECStatus(0) > 0 && SCStatus(0)>0
           )
           {
             partId = "electron";

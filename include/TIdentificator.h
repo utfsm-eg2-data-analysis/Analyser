@@ -47,8 +47,8 @@ public:
     Double_t Px(Int_t k, Bool_t kind = 0);        // inline
     Double_t Py(Int_t k, Bool_t kind = 0);        // inline
     Double_t Pz(Int_t k, Bool_t kind = 0);        // inline
-    Double_t X(Int_t k);                          // inline
-    Double_t Y(Int_t k);                          // inline
+    Double_t X(Int_t k, Bool_t kind = 0);         // inline
+    Double_t Y(Int_t k, Bool_t kind = 0);         // inline
     Double_t Z(Int_t k, Bool_t kind = 0);         // inline
     Int_t StatCC(Int_t k);                        // inline
     Int_t StatSC(Int_t k);                        // inline
