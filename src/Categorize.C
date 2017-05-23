@@ -1,4 +1,4 @@
-TString TIdentificator::GetCategorization(Int_t k)
+TString TIdentificator::GetCategorization(Int_t k, const char* tt)
 {
     Int_t number_dc = fCT->GetNRows("DCPB");
     Int_t number_cc = fCT->GetNRows("CCPB");
@@ -24,14 +24,13 @@ TString TIdentificator::GetCategorization(Int_t k)
                     Momentum(0)>0.75&& // Momentum triger added. osoto_mod.
                     Ein(0)>0.06&& // Inner stack energy cut. osoto_mod.
                     (TimeEC(0)- TimeSC(0) - (PathEC(0)-PathSC(0) )/30) < 5*0.35 &&// elapsed time between sc and ec (??). osoto_mod.
-                    SampFracCheck()&&
+                    SampFracCheck(tt)&&
                     Etot(0) / 0.27 / 1.15 + 0.4 > Momentum(0) &&
                     Etot(0) / 0.27 / 1.15 - 0.2 < Momentum(0) &&
                     Ein(0) + Eout(0) > 0.8 * 0.27 * Momentum(0) &&
                     Ein(0) + Eout(0) < 1.2 * 0.27 * Momentum(0) &&
                     Eout(0) != 0 && FidCheckCut() == 1)
             partId = "electron";
-
 
         if (k > 0) {
             if (Charge(k) == 0 )
@@ -75,6 +74,25 @@ TString TIdentificator::GetCategorization(Int_t k)
 		    )
 		  partId = "pi-";
 	      }
+	    if (    Status(k) > 0 && Status(k) < 100 &&
+                    Charge(k) == -1 &&
+                    number_cc != 0 && number_ec != 0 && number_sc != 0 &&
+                    StatCC(k) > 0 && StatSC(k) > 0 &&
+                    StatDC(k) > 0 && StatEC(k) > 0 &&
+                    DCStatus(k) > 0 && SCStatus(k) == 33 &&
+                    Nphe(0) > (Sector(k)==0||Sector(k)==1)*25 //Added sector dependent cut. osoto_mod.
+                              +(Sector(k)==2)*26 
+                              +(Sector(k)==3)*21
+                              +(Sector(k)==4 || Sector(k)==5 )*28 &&
+                    Momentum(k)>0.75&& // Momentum triger added. osoto_mod.
+                    Ein(k)>0.06&& // Inner stack energy cut. osoto_mod.
+		    Etot(k) / 0.27 / 1.15 + 0.4 > Momentum(k) &&
+                    Etot(k) / 0.27 / 1.15 - 0.2 < Momentum(k) &&
+                    Ein(k) + Eout(k) > 0.8 * 0.27 * Momentum(k) &&
+                    Ein(k) + Eout(k) < 1.2 * 0.27 * Momentum(k) &&
+                    Eout(k) != 0)
+	      partId = "s_electron";
+
 
             //positive particles
             if (Charge(k) == 1 &&
@@ -126,6 +144,7 @@ TString TIdentificator::GetCategorization(Int_t k)
                             Ein(k) + Eout(k) < 1.2 * 0.27 * Momentum(k))
                     partId = "positron";
             }
+
         }
     }
 

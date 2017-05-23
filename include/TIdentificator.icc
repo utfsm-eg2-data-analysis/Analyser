@@ -505,14 +505,29 @@ inline Float_t TIdentificator::PathEC(Int_t k)
     }
 }
 
-inline bool TIdentificator::SampFracCheck()
+inline bool TIdentificator::SampFracCheck(const char *tt)
 {
   bool ret=false;
   Double_t E=TMath::Max(Etot(0),Ein(0)+Eout(0));
   Double_t p=Momentum(0);
   Int_t s = Sector(0);
-  Double_t MeanE = kMeanFePar[s][0] + kMeanFePar[s][1]*p + kMeanFePar[s][2]*p*p;
-  Double_t SigmaE = TMath::Sqrt(kSigmaFePar[s][0]*kSigmaFePar[s][0] + kSigmaFePar[s][1]*kSigmaFePar[s][1]/p);
+  Double_t MeanE;
+  Double_t SigmaE;
+  if (!strcmp(tt,"Fe") ) 
+  {
+     MeanE = kMeanFePar[s][0] + kMeanFePar[s][1]*p + kMeanFePar[s][2]*p*p;
+     SigmaE = TMath::Sqrt(kSigmaFePar[s][0]*kSigmaFePar[s][0] + kSigmaFePar[s][1]*kSigmaFePar[s][1]/p);
+  }
+  else if (!strcmp(tt,"C") ) 
+  {
+     MeanE = kMeanCPar[s][0] + kMeanCPar[s][1]*p + kMeanCPar[s][2]*p*p;
+     SigmaE = TMath::Sqrt(kSigmaCPar[s][0]*kSigmaCPar[s][0] + kSigmaCPar[s][1]*kSigmaCPar[s][1]/p);
+  }
+  else if (!strcmp(tt,"Pb") ) 
+  {
+     MeanE = kMeanPbPar[s][0] + kMeanPbPar[s][1]*p + kMeanPbPar[s][2]*p*p;
+     SigmaE = TMath::Sqrt(kSigmaPbPar[s][0]*kSigmaPbPar[s][0] + kSigmaPbPar[s][1]*kSigmaPbPar[s][1]/p);
+  }
   if (TMath::Abs( E/p - MeanE )< 2.5*SigmaE)
     ret=true;
   return ret;

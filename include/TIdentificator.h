@@ -125,7 +125,7 @@ public:
 	 //Int_t ElecVertTarg(Bool_t = 0);
 
     // Particle Identification cuts
-    TString GetCategorization(Int_t k);
+    TString GetCategorization(Int_t k, const char*tt = "Fe");
     TString GetCategorizationOld(Int_t k);
     TString GetCategorizationMin(Int_t k); 
     TString* GetCategorization();
@@ -154,7 +154,7 @@ public:
 
     //Other methods.
     TVector3 *XYZToUVW(TVector3 *xyz);            //osoto add
-    bool SampFracCheck();                         // inline //osoto add 
+    bool SampFracCheck(const char* tt = "Fe");                         // inline //osoto add 
 
 private:
     const Double_t kEbeam;    // The energy of incoming electron beam
