@@ -507,6 +507,7 @@ inline Float_t TIdentificator::PathEC(Int_t k)
 
 inline bool TIdentificator::SampFracCheck(const char *tt)
 {
+  if ( !strcmp(tt,"") ) return true;
   bool ret=false;
   Double_t E=TMath::Max(Etot(0),Ein(0)+Eout(0));
   Double_t p=Momentum(0);
