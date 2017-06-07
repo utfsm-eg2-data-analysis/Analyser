@@ -125,7 +125,7 @@ public:
 	 //Int_t ElecVertTarg(Bool_t = 0);
 
     // Particle Identification cuts
-    TString GetCategorization(Int_t k, const char*tt = "");
+    TString GetCategorization(Int_t k, const char*tt = "",bool mflag=false);
     TString GetCategorizationOld(Int_t k);
     TString GetCategorizationMin(Int_t k); 
     TString* GetCategorization();
