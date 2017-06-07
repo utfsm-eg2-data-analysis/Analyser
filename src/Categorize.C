@@ -21,6 +21,7 @@ TString TIdentificator::GetCategorization(Int_t k, const char* tt, bool mflag)
 	    +(Sector(0)==2)*26 
 	    +(Sector(0)==3)*21
 	     +(Sector(0)==4 || Sector(0)==5 )*28)&&
+	    (mflag || Nphe(0)>25)&& //default hayk cc nphe.
 	    (!mflag || Momentum(0)>0.75)&& // Momentum triger added. osoto_mod.
 	    (!mflag || Ein(0)>0.06)&& // Inner stack energy cut. osoto_mod.
 	    (!mflag || (TimeEC(0)- TimeSC(0) - (PathEC(0)-PathSC(0) )/30) < 5*0.35 )&&// elapsed time between sc and ec (??). osoto_mod.
