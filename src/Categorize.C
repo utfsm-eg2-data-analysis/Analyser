@@ -349,9 +349,10 @@ TString TIdentificator::GetCategorizationMin(Int_t k)
     }
 
     return partId;
+}
     
-    TString TIdentificator::GetCategorizationGSIM(Int_t k)
-    {
+TString TIdentificator::GetCategorizationGSIM(Int_t k)
+{
         TString partId;
         
         switch(int(Id(k,1))){
@@ -385,11 +386,11 @@ TString TIdentificator::GetCategorizationMin(Int_t k)
         }
         
         return partId;
-    }
+}
     
-    TString TIdentificator::GetCategorizationParticle(Int_t k, Bool_t kind)
-    {
-        TString partId;
+TString TIdentificator::GetCategorizationParticle(Int_t k, Bool_t kind)
+{
+  	TString partId;
         
         if (kind == 0){
             partId = GetCategorizationMin(k);
