@@ -69,6 +69,10 @@ public:
     Double_t Ein(Int_t k);                        // inline
     Double_t Eout(Int_t k);                       // inline
     Double_t ECStatus(Int_t k);                   // inline
+    Double_t EChit_Moment2(Int_t k);              // inline // wood add
+    Double_t EChit_Moment3(Int_t k);              // inline // wood add
+    Double_t EChit_Moment4(Int_t k);              // inline // wood add
+    Double_t Chi2EC(Int_t k);                     // inline // wood add
     Float_t XEC(Int_t k);                         // inline // osoto add
     Float_t YEC(Int_t k);                         // inline // osoto add
     Float_t ZEC(Int_t k);                         // inline // osoto add
@@ -127,7 +131,9 @@ public:
     // Particle Identification cuts
     TString GetCategorization(Int_t k, const char*tt = "",bool mflag=false);
     TString GetCategorizationOld(Int_t k);
-    TString GetCategorizationMin(Int_t k); 
+    TString GetCategorizationMin(Int_t k);
+    TString GetCategorizationGSIM(Int_t k);
+    TString GetCategorizationParticle(Int_t k, Bool_t kind);
     TString* GetCategorization();
     void PrintCategorization();
     void PrintCategorization(TString* partIds);

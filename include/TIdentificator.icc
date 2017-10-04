@@ -37,8 +37,8 @@ inline Double_t TIdentificator::Betta(Int_t k, Bool_t kind)
     fEVNT = (TEVNTClass *) fCT->GetBankRow("EVNT", k);
     return fEVNT->Betta;
   } else {
-    //fEVNT = (TEVNTClass *) fCT->GetBankRow("GSIM", k);
-    //return fEVNT->Betta;
+    fGSIM = (TGSIMClass *) fCT->GetBankRow("GSIM", k);
+    return fGSIM->Betta;
     return 0;
   }
 }
@@ -351,7 +351,57 @@ inline Double_t TIdentificator::Eout(Int_t k)
     }
 }
 
+inline Double_t TIdentificator::EChit_Moment2(Int_t k)
+{
+    fEVNT = (TEVNTClass *) fCT->GetBankRow("EVNT", k);
 
+    if (fEVNT->Ecstat >=1) {
+        Int_t ec_stat = fEVNT->Ecstat - 1;
+        fECPB = (TECPBClass *) fCT->GetBankRow("ECPB", ec_stat);
+        return fECPB->M2_hit;
+    } else {
+        return kGOOD;
+    }
+}
+
+inline Double_t TIdentificator::EChit_Moment3(Int_t k)
+{
+    fEVNT = (TEVNTClass *) fCT->GetBankRow("EVNT", k);
+
+    if (fEVNT->Ecstat >=1) {
+        Int_t ec_stat = fEVNT->Ecstat - 1;
+        fECPB = (TECPBClass *) fCT->GetBankRow("ECPB", ec_stat);
+        return fECPB->M3_hit;
+    } else {
+        return kGOOD;
+    }
+}
+
+inline Double_t TIdentificator::EChit_Moment4(Int_t k)
+{
+    fEVNT = (TEVNTClass *) fCT->GetBankRow("EVNT", k);
+
+    if (fEVNT->Ecstat >=1) {
+        Int_t ec_stat = fEVNT->Ecstat - 1;
+        fECPB = (TECPBClass *) fCT->GetBankRow("ECPB", ec_stat);
+        return fECPB->M4_hit;
+    } else {
+        return kGOOD;
+    }
+}
+
+inline Double_t TIdentificator::Chi2EC(Int_t k)
+{
+    fEVNT = (TEVNTClass *) fCT->GetBankRow("EVNT", k);
+
+    if (fEVNT->Ecstat >=1) {
+        Int_t ec_stat = fEVNT->Ecstat - 1;
+        fECPB = (TECPBClass *) fCT->GetBankRow("ECPB", ec_stat);
+        return fECPB->Chi2ec;
+    } else {
+        return kGOOD;
+    }
+}
 
 inline Double_t TIdentificator::ECStatus(Int_t k)
 {
