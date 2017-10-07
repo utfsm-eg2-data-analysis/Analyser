@@ -355,16 +355,16 @@ TString TIdentificator::GetCategorizationGSIM(Int_t k)
 {
         TString partId;
         
-        switch(int(Id(k,1))){
+        switch(int(Id(k,1))){ // recall the particle ID from the GSIM bank
             case 1: partId = "gamma"; break;
             case 2: partId = "positron"; break;
             case 3: partId = "electron"; break;
             case 4: partId = "electron neutrino"; break;
             case 5: partId = "muon-"; break;
             case 6: partId = "muon+"; break;
-            case 7: partId = "pion0"; break;
-            case 8: partId = "pion+"; break;
-            case 9: partId = "pion-"; break;
+            case 7: partId = "pi0"; break;
+            case 8: partId = "pi+"; break;
+            case 9: partId = "pi-"; break;
             case 10: partId = "Kaon_L0"; break;
             case 11: partId = "Kaon+"; break;
             case 12: partId = "Kaon-"; break;
@@ -387,11 +387,48 @@ TString TIdentificator::GetCategorizationGSIM(Int_t k)
         
         return partId;
 }
+
+TString TIdentificator::GetCategorizationEVNT(Int_t k)
+{
+    TString partId;
     
+    switch(int(Id(k,0))){  // recall the particle ID from the EVNT bank
+        case 22: partId = "gamma"; break;
+        case -11: partId = "positron"; break;
+        case 11: partId = "electron"; break;
+//        case 4: partId = "electron neutrino"; break;
+//        case 5: partId = "muon-"; break;
+//        case 6: partId = "muon+"; break;
+        case 111: partId = "pi0"; break;
+        case 211: partId = "pi+"; break;
+        case -211: partId = "pi-"; break;
+//        case 10: partId = "Kaon_L0"; break;
+        case 321: partId = "Kaon+"; break;
+        case -321: partId = "Kaon-"; break;
+        case 2112: partId = "neuton"; break;
+        case 2212: partId = "proton"; break;
+        case -2212: partId = "antiproton"; break;
+//        case 16: partId = "Kaon_S0"; break;
+//        case 17: partId = "eta"; break;
+//        case 18: partId = "Lambda"; break;
+//        case 19: partId = "Sigma+"; break;
+//        case 20: partId = "Sigma0"; break;
+//        case 21: partId = "Sigma-"; break;
+//        case 22: partId = "Xi0"; break;
+//        case 23: partId = "Xi-"; break;
+//        case 24: partId = "Omega-"; break;
+//        case 25: partId = "antineutron"; break;
+//        case 26: partId = "Lambda-"; break;
+        default: partId = "not recognized"; break;
+    }
+    
+    return partId;
+}
+
 TString TIdentificator::GetCategorizationParticle(Int_t k, Bool_t kind)
 {
   	TString partId;
-        
+    
         if (kind == 0){
             partId = GetCategorizationMin(k);
         }else{

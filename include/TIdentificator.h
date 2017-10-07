@@ -133,6 +133,7 @@ public:
     TString GetCategorizationOld(Int_t k);
     TString GetCategorizationMin(Int_t k);
     TString GetCategorizationGSIM(Int_t k);
+    TString GetCategorizationEVNT(Int_t k);
     TString GetCategorizationParticle(Int_t k, Bool_t kind);
     TString* GetCategorization();
     void PrintCategorization();
