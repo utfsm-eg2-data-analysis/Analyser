@@ -429,7 +429,7 @@ TString TIdentificator::GetCategorizationParticle(Int_t k, Bool_t kind)
   	TString partId;
     
         if (kind == 0){
-            partId = GetCategorizationMin(k);
+            partId = GetCategorizationEVNT(k);
         }else{
             partId = GetCategorizationGSIM(k);
         }
