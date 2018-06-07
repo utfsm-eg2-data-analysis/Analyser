@@ -354,8 +354,10 @@ TString TIdentificator::GetCategorizationMin(Int_t k)
 TString TIdentificator::GetCategorizationGSIM(Int_t k)
 {
         TString partId;
-        
-        switch(int(Id(k,1))){ // recall the particle ID from the GSIM bank
+    
+        partId = GetCategorizationEVNT(k); // temporary fix if GSIM uses PDG id numbers
+
+/*        switch(int(Id(k,1))){ // recall the particle ID from the GSIM bank
             case 1: partId = "gamma"; break;
             case 2: partId = "positron"; break;
             case 3: partId = "electron"; break;
@@ -384,7 +386,7 @@ TString TIdentificator::GetCategorizationGSIM(Int_t k)
             case 26: partId = "Lambda-"; break;
             default: partId = "not recognized"; break;
         }
-        
+*/
         return partId;
 }
 
