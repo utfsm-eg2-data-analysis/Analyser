@@ -368,7 +368,7 @@ TString TIdentificator::GetCategorizationGSIM(Int_t k)
             case 10: partId = "Kaon_L0"; break;
             case 11: partId = "Kaon+"; break;
             case 12: partId = "Kaon-"; break;
-            case 13: partId = "neuton"; break;
+            case 13: partId = "neutron"; break;
             case 14: partId = "proton"; break;
             case 15: partId = "antiproton"; break;
             case 16: partId = "Kaon_S0"; break;
@@ -405,7 +405,7 @@ TString TIdentificator::GetCategorizationEVNT(Int_t k)
         case 130: partId = "Kaon_L0"; break;
         case 321: partId = "Kaon+"; break;
         case -321: partId = "Kaon-"; break;
-        case 2112: partId = "neuton"; break;
+        case 2112: partId = "neutron"; break;
         case 2212: partId = "proton"; break;
         case -2212: partId = "antiproton"; break;
         case 310: partId = "Kaon_S0"; break;
