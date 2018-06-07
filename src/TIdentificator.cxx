@@ -173,7 +173,11 @@ Double_t TIdentificator::Mass2(Int_t k, Bool_t kind)
 {
     // Return the mass squared for the particle in the row k of the EVNT bank.
 
-    return Momentum(k) * Momentum(k) * (pow(Betta(k), -2) - 1);
+    if (kind == 0) {
+        return Momentum(k) * Momentum(k) * (pow(Betta(k), -2) - 1);
+    } else {
+        return Momentum(k,1) * Momentum(k,1) * (pow(Betta(k,1), -2) - 1);
+    }
 }
 
 
