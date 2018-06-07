@@ -354,11 +354,36 @@ TString TIdentificator::GetCategorizationMin(Int_t k)
 TString TIdentificator::GetCategorizationGSIM(Int_t k)
 {
         TString partId;
-    
-        partId = GetCategorizationEVNT(k); // temporary fix if GSIM uses PDG id numbers
 
-/*        switch(int(Id(k,1))){ // recall the particle ID from the GSIM bank
-            case 1: partId = "gamma"; break;
+        switch(int(Id(k,1))){ // recall the particle ID from the GSIM bank
+            case 22: partId = "gamma"; break;
+            case -11: partId = "positron"; break;
+            case 11: partId = "electron"; break;
+            case 12: partId = "electron neutrino"; break;
+            case 13: partId = "muon-"; break;
+            case -13: partId = "muon+"; break;
+            case 111: partId = "pi0"; break;
+            case 211: partId = "pi+"; break;
+            case -211: partId = "pi-"; break;
+            case 130: partId = "Kaon_L0"; break;
+            case 321: partId = "Kaon+"; break;
+            case -321: partId = "Kaon-"; break;
+            case 2112: partId = "neutron"; break;
+            case 2212: partId = "proton"; break;
+            case -2212: partId = "antiproton"; break;
+            case 310: partId = "Kaon_S0"; break;
+            case 221: partId = "eta"; break;
+            case 3122: partId = "Lambda"; break;
+            case 3222: partId = "Sigma+"; break;
+            case 3212: partId = "Sigma0"; break;
+            case 3112: partId = "Sigma-"; break;
+            case 3322: partId = "Xi0"; break;
+            case 3312: partId = "Xi-"; break;
+            case 3334: partId = "Omega-"; break;
+            case -2112: partId = "antineutron"; break;
+            default: partId = "not recognized"; break;
+
+/*            case 1: partId = "gamma"; break;
             case 2: partId = "positron"; break;
             case 3: partId = "electron"; break;
             case 4: partId = "electron neutrino"; break;
@@ -385,8 +410,9 @@ TString TIdentificator::GetCategorizationGSIM(Int_t k)
             case 25: partId = "antineutron"; break;
             case 26: partId = "Lambda-"; break;
             default: partId = "not recognized"; break;
-        }
 */
+        }
+
         return partId;
 }
 
