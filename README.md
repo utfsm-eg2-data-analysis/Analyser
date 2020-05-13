@@ -12,25 +12,27 @@ It includes the C++ class TIdentificator, which is in charge of the particle ide
 ### Environment variables
 
 In sumary, you must define the following environment variables:
-*`CLASTOOL` as the current ClasTool directory
-*`CLAS_LIB` as the current clas_lib directory
-*`CLAS_PACK` as the current clas_pack directory
-*`ANALYSER` as the current Analyser directory
+* `CLASTOOL` as the current ClasTool directory
+* `CLAS_LIB` as the current clas_lib directory
+* `CLAS_PACK` as the current clas_pack directory
+* `ANALYSER` as the current Analyser directory
 
-These next two variables, should have these values:
-*OS_NAME=`uname`
-*OSNAME=${OS_NAME}
+These next two variables should have these values:
+```
+OS_NAME=`uname`
+OSNAME=${OS_NAME}
+```
 
 And, also:
-*add `${CLASTOOL}/bin/${OSNAME}` to your `PATH` variable
-*add `${ANALYSER}/include` and `${CLASTOOL}/include` to your `ROOT_INCLUDE_PATH` variable
-*add `${ANALYSER}/slib` and `${CLASTOOL}/slib/${OS_NAME}` to your `LD_LIBRARY_PATH`
+* add `${CLASTOOL}/bin/${OSNAME}` to your `PATH` variable
+* add `${ANALYSER}/include` and `${CLASTOOL}/include` to your `ROOT_INCLUDE_PATH` variable
+* add `${ANALYSER}/slib` and `${CLASTOOL}/slib/${OS_NAME}` to your `LD_LIBRARY_PATH`
 
 #### Example for Bash
 
 If you're using Bash as your Unix shell, you only need to add the following lines at the end of your `.bashrc` file located in
-your home directory. **Note:** here I defined another environment variable called `TOPDIR`, where all the related repositories
-are installed.
+your home directory. **Note:** here I previously defined another environment variable called `TOPDIR`, which stands for a directory
+where all the related repositories are located.
 ```
 export OS_NAME=`uname`
 export OSNAME=${OS_NAME}
@@ -44,21 +46,14 @@ export PATH=${CLASTOOL}/bin/${OSNAME}:${PATH}
 export ROOT_INCLUDE_PATH=${ANALYSER}/include:${CLASTOOL}/include:${ROOT_INCLUDE_PATH}
 export LD_LIBRARY_PATH=${CLASTOOL}/slib/${OS_NAME}:${ANALYSER}/slib:${LD_LIBRARY_PATH}
 ```
-For this to make effect, remember to reload your bash session: by closing and opening your terminal session or by executing
+For this to make effect, remember to reload your bash session: by closing and opening your terminal session or by executing:
 ```
 source .bashrc
 ```
 
 ### Compilation
 
-Compile by running Makefile, entering the ClasTool directory
-
-For a faster compilation, you could try
-```
-make -j4
-```
-But make sure with a last execution of `make`
-
+Compile by running Makefile.
 
 ### Integration with ROOT command console
 
