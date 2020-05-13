@@ -76,3 +76,18 @@ Which you will fill with this only line:
 ```
 Rint.Logon: ~/rootlogon.C
 ```
+
+### Debug for ROOT
+
+From ROOT v6.14 onwards, it has become necessary to copy all dictionaries files into the dynamic libraries folders `slib`.
+To fix the annoying warning message, you should run this commands:
+
+* Inside ClasTool directory, run:
+```
+find . -name *.pcm -exec cp -t ./slib/Linux {} +
+```
+
+* Inside Analyser directory, run:
+```
+find . -name *.pcm -exec cp -t ./slib {} +
+```
