@@ -47,8 +47,8 @@ public:
     Double_t Px(Int_t k, Bool_t kind = 0);        // inline
     Double_t Py(Int_t k, Bool_t kind = 0);        // inline
     Double_t Pz(Int_t k, Bool_t kind = 0);        // inline
-    Double_t X(Int_t k);                          // inline
-    Double_t Y(Int_t k);                          // inline
+    Double_t X(Int_t k, Bool_t kind = 0);         // inline
+    Double_t Y(Int_t k, Bool_t kind = 0);         // inline
     Double_t Z(Int_t k, Bool_t kind = 0);         // inline
     Int_t StatCC(Int_t k);                        // inline
     Int_t StatSC(Int_t k);                        // inline
@@ -69,6 +69,15 @@ public:
     Double_t Ein(Int_t k);                        // inline
     Double_t Eout(Int_t k);                       // inline
     Double_t ECStatus(Int_t k);                   // inline
+    Double_t EChit_Moment2(Int_t k);              // inline // wood add
+    Double_t EChit_Moment3(Int_t k);              // inline // wood add
+    Double_t EChit_Moment4(Int_t k);              // inline // wood add
+    Double_t Chi2EC(Int_t k);                     // inline // wood add
+    Float_t XEC(Int_t k);                         // inline // osoto add
+    Float_t YEC(Int_t k);                         // inline // osoto add
+    Float_t ZEC(Int_t k);                         // inline // osoto add
+    Float_t TimeEC(Int_t k);                      // inline // osoto add
+    Float_t PathEC(Int_t k);                      // inline // osoto add
 
     // SCPB
     Double_t PathSC(Int_t k);                     // inline
@@ -113,13 +122,19 @@ public:
 
     // Correction functions
     Double_t TimeCorr4(Double_t mass, Int_t k);
+    TVector3 *GetCorrectedVert();
+
 
 	 //Added in hayk's code
 	 //Int_t ElecVertTarg(Bool_t = 0);
 
     // Particle Identification cuts
-    TString GetCategorization(Int_t k);
+    TString GetCategorization(Int_t k, const char*tt = "",bool mflag=false);
     TString GetCategorizationOld(Int_t k);
+    TString GetCategorizationMin(Int_t k);
+    TString GetCategorizationGSIM(Int_t k);
+    TString GetCategorizationEVNT(Int_t k);
+    TString GetCategorizationParticle(Int_t k, Bool_t kind);
     TString* GetCategorization();
     void PrintCategorization();
     void PrintCategorization(TString* partIds);
@@ -143,6 +158,10 @@ public:
     Int_t ElecVertTarg();
     Int_t ElecVertTarg(Bool_t kind);
     Bool_t PionVertTarg(Int_t k);
+
+    //Other methods.
+    TVector3 *XYZToUVW(TVector3 *xyz);            //osoto add
+    bool SampFracCheck(const char* tt = "");                         // inline //osoto add 
 
 private:
     const Double_t kEbeam;    // The energy of incoming electron beam

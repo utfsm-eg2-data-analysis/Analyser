@@ -1,6 +1,13 @@
 #ifndef TIDENTIFICATOR_INLINES_H
 #define TIDENTIFICATOR_INLINES_H
+extern const Double_t kMeanFePar[6][3];
+extern const Double_t kSigmaFePar[6][2];
 
+extern const Double_t kMeanCPar[6][3];
+extern const Double_t kSigmaCPar[6][2];
+
+extern const Double_t kMeanPbPar[6][3];
+extern const Double_t kSigmaPbPar[6][2];
 
 inline Float_t TIdentificator::NEvent()
 {
@@ -30,8 +37,8 @@ inline Double_t TIdentificator::Betta(Int_t k, Bool_t kind)
     fEVNT = (TEVNTClass *) fCT->GetBankRow("EVNT", k);
     return fEVNT->Betta;
   } else {
-    //fEVNT = (TEVNTClass *) fCT->GetBankRow("GSIM", k);
-    //return fEVNT->Betta;
+    fGSIM = (TGSIMClass *) fCT->GetBankRow("GSIM", k);
+    return fGSIM->Betta;
     return 0;
   }
 }
@@ -129,24 +136,30 @@ inline Double_t TIdentificator::Pz(Int_t k, Bool_t kind)
 
 
 
-inline Double_t TIdentificator::X(Int_t k)
+inline Double_t TIdentificator::X(Int_t k, Bool_t kind)
 {
     // Return the X coordinate for the particle in the row k of the EVNT bank.
-
-    fEVNT = (TEVNTClass *) fCT->GetBankRow("EVNT", k);
-    return fEVNT->X;
+    if (kind == 0) {
+      fEVNT = (TEVNTClass *) fCT->GetBankRow("EVNT", k);
+      return fEVNT->X;
+    } else { 
+      	fGSIM = (TGSIMClass *) fCT->GetBankRow("GSIM", k);
+        return fGSIM->X;
+    }
 }
 
 
-
-inline Double_t TIdentificator::Y(Int_t k)
+inline Double_t TIdentificator::Y(Int_t k, Bool_t kind)
 {
     // Return the Y coordinate for the particle in the row k of the EVNT bank.
-
-    fEVNT = (TEVNTClass*)fCT->GetBankRow("EVNT",k);
-    return fEVNT->Y;
+    if (kind == 0) {
+        fEVNT = (TEVNTClass*)fCT->GetBankRow("EVNT",k);
+    	return fEVNT->Y;
+    } else { 
+      	fGSIM = (TGSIMClass *) fCT->GetBankRow("GSIM", k);
+        return fGSIM->Y;
+    }
 }
-
 
 
 inline Double_t TIdentificator::Z(Int_t k, Bool_t kind)
@@ -338,7 +351,57 @@ inline Double_t TIdentificator::Eout(Int_t k)
     }
 }
 
+inline Double_t TIdentificator::EChit_Moment2(Int_t k)
+{
+    fEVNT = (TEVNTClass *) fCT->GetBankRow("EVNT", k);
 
+    if (fEVNT->Ecstat >=1) {
+        Int_t ec_stat = fEVNT->Ecstat - 1;
+        fECPB = (TECPBClass *) fCT->GetBankRow("ECPB", ec_stat);
+        return fECPB->M2_hit;
+    } else {
+        return kGOOD;
+    }
+}
+
+inline Double_t TIdentificator::EChit_Moment3(Int_t k)
+{
+    fEVNT = (TEVNTClass *) fCT->GetBankRow("EVNT", k);
+
+    if (fEVNT->Ecstat >=1) {
+        Int_t ec_stat = fEVNT->Ecstat - 1;
+        fECPB = (TECPBClass *) fCT->GetBankRow("ECPB", ec_stat);
+        return fECPB->M3_hit;
+    } else {
+        return kGOOD;
+    }
+}
+
+inline Double_t TIdentificator::EChit_Moment4(Int_t k)
+{
+    fEVNT = (TEVNTClass *) fCT->GetBankRow("EVNT", k);
+
+    if (fEVNT->Ecstat >=1) {
+        Int_t ec_stat = fEVNT->Ecstat - 1;
+        fECPB = (TECPBClass *) fCT->GetBankRow("ECPB", ec_stat);
+        return fECPB->M4_hit;
+    } else {
+        return kGOOD;
+    }
+}
+
+inline Double_t TIdentificator::Chi2EC(Int_t k)
+{
+    fEVNT = (TEVNTClass *) fCT->GetBankRow("EVNT", k);
+
+    if (fEVNT->Ecstat >=1) {
+        Int_t ec_stat = fEVNT->Ecstat - 1;
+        fECPB = (TECPBClass *) fCT->GetBankRow("ECPB", ec_stat);
+        return fECPB->Chi2ec;
+    } else {
+        return kGOOD;
+    }
+}
 
 inline Double_t TIdentificator::ECStatus(Int_t k)
 {
@@ -427,4 +490,97 @@ inline Double_t TIdentificator::SCStatus(Int_t k)
     }
 }
 
+inline Float_t TIdentificator::XEC(Int_t k)
+{
+    fEVNT = (TEVNTClass *) fCT->GetBankRow("EVNT", k);
+
+    if (fEVNT->Ecstat >= 1) {
+        Int_t ec_stat= fEVNT->Ecstat - 1;
+        fECPB = (TECPBClass *) fCT->GetBankRow("ECPB", ec_stat);
+        return fECPB->X;
+    } else {
+        return kGOOD;
+    }
+}
+
+inline Float_t TIdentificator::YEC(Int_t k)
+{
+    fEVNT = (TEVNTClass *) fCT->GetBankRow("EVNT", k);
+
+    if (fEVNT->Ecstat >= 1) {
+        Int_t ec_stat= fEVNT->Ecstat - 1;
+        fECPB = (TECPBClass *) fCT->GetBankRow("ECPB", ec_stat);
+        return fECPB->Y;
+    } else {
+        return kGOOD;
+    }
+}
+
+inline Float_t TIdentificator::ZEC(Int_t k)
+{
+    fEVNT = (TEVNTClass *) fCT->GetBankRow("EVNT", k);
+
+    if (fEVNT->Ecstat >= 1) {
+        Int_t ec_stat= fEVNT->Ecstat - 1;
+        fECPB = (TECPBClass *) fCT->GetBankRow("ECPB", ec_stat);
+        return fECPB->Z;
+    } else {
+        return kGOOD;
+    }
+}
+
+inline Float_t TIdentificator::TimeEC(Int_t k)
+{
+    fEVNT = (TEVNTClass *) fCT->GetBankRow("EVNT", k);
+
+    if (fEVNT->Ecstat >= 1) {
+        Int_t ec_stat= fEVNT->Ecstat - 1;
+        fECPB = (TECPBClass *) fCT->GetBankRow("ECPB", ec_stat);
+        return fECPB->Time;
+    } else {
+        return kGOOD;
+    }
+}
+
+inline Float_t TIdentificator::PathEC(Int_t k)
+{
+    fEVNT = (TEVNTClass *) fCT->GetBankRow("EVNT", k);
+
+    if (fEVNT->Ecstat >= 1) {
+        Int_t ec_stat= fEVNT->Ecstat - 1;
+        fECPB = (TECPBClass *) fCT->GetBankRow("ECPB", ec_stat);
+        return fECPB->Path;
+    } else {
+        return kGOOD;
+    }
+}
+
+inline bool TIdentificator::SampFracCheck(const char *tt)
+{
+  if ( !strcmp(tt,"") ) return true;
+  bool ret=false;
+  Double_t E=TMath::Max(Etot(0),Ein(0)+Eout(0));
+  Double_t p=Momentum(0);
+  Int_t s = Sector(0);
+  Double_t MeanE;
+  Double_t SigmaE;
+  if (!strcmp(tt,"Fe") ) 
+  {
+     MeanE = kMeanFePar[s][0] + kMeanFePar[s][1]*p + kMeanFePar[s][2]*p*p;
+     SigmaE = TMath::Sqrt(kSigmaFePar[s][0]*kSigmaFePar[s][0] + kSigmaFePar[s][1]*kSigmaFePar[s][1]/p);
+  }
+  else if (!strcmp(tt,"C") ) 
+  {
+     MeanE = kMeanCPar[s][0] + kMeanCPar[s][1]*p + kMeanCPar[s][2]*p*p;
+     SigmaE = TMath::Sqrt(kSigmaCPar[s][0]*kSigmaCPar[s][0] + kSigmaCPar[s][1]*kSigmaCPar[s][1]/p);
+  }
+  else if (!strcmp(tt,"Pb") ) 
+  {
+     MeanE = kMeanPbPar[s][0] + kMeanPbPar[s][1]*p + kMeanPbPar[s][2]*p*p;
+     SigmaE = TMath::Sqrt(kSigmaPbPar[s][0]*kSigmaPbPar[s][0] + kSigmaPbPar[s][1]*kSigmaPbPar[s][1]/p);
+  }
+  if (TMath::Abs( E/p - MeanE )< 2.5*SigmaE)
+    ret=true;
+  return ret;
+}
 #endif
