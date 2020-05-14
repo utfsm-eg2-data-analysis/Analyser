@@ -564,22 +564,20 @@ inline bool TIdentificator::SampFracCheck(const char *tt)
   Int_t s = Sector(0);
   Double_t MeanE;
   Double_t SigmaE;
-  if (!strcmp(tt,"Fe") ) 
-  {
+  if (!strcmp(tt, "Fe")) {
      MeanE = kMeanFePar[s][0] + kMeanFePar[s][1]*p + kMeanFePar[s][2]*p*p;
      SigmaE = TMath::Sqrt(kSigmaFePar[s][0]*kSigmaFePar[s][0] + kSigmaFePar[s][1]*kSigmaFePar[s][1]/p);
-  }
-  else if (!strcmp(tt,"C") ) 
-  {
+  } else if (!strcmp(tt, "C")) {
      MeanE = kMeanCPar[s][0] + kMeanCPar[s][1]*p + kMeanCPar[s][2]*p*p;
      SigmaE = TMath::Sqrt(kSigmaCPar[s][0]*kSigmaCPar[s][0] + kSigmaCPar[s][1]*kSigmaCPar[s][1]/p);
-  }
-  else if (!strcmp(tt,"Pb") ) 
-  {
+  } else if (!strcmp(tt, "Pb")) {
      MeanE = kMeanPbPar[s][0] + kMeanPbPar[s][1]*p + kMeanPbPar[s][2]*p*p;
      SigmaE = TMath::Sqrt(kSigmaPbPar[s][0]*kSigmaPbPar[s][0] + kSigmaPbPar[s][1]*kSigmaPbPar[s][1]/p);
+  } else if (!strcmp(tt, "Sim")) { // borquez mod, based on TM analysis
+     MeanE = 0.2623 + 0.0089*p + 0.0019*p*p;
+     SigmaE = TMath::Sqrt(0.0057*0.0057 + 0.0305*0.0305/p);
   }
-  if (TMath::Abs( E/p - MeanE )< 2.5*SigmaE)
+  if (TMath::Abs(E/p - MeanE) < 2.5*SigmaE)
     ret=true;
   return ret;
 }
