@@ -1,4 +1,4 @@
-TIdentificator::GetCategorization(Int_t k, const char* tt)
+TString TIdentificator::GetCategorization(Int_t k, const char* tt)
 {
   Int_t number_dc = fCT->GetNRows("DCPB");
   Int_t number_cc = fCT->GetNRows("CCPB");
@@ -29,7 +29,7 @@ TIdentificator::GetCategorization(Int_t k, const char* tt)
 	   + (Sector(0)==4 || Sector(0)==5)*28) &&
 	  Momentum(0) > 0.64 && // borquez_mod
 	  Ein(0) > 0.06 && // inner stack energy cut
-	  ((TimeEC(0) - TimeSC(0) - (PathEC(0) - PathSC(0))/30) < 5*0.35) && // SC and EC coincidence time
+	  ((TimeEC(0) - TimeSC(0) - (PathEC(0) - PathSC(0))/30) < 5*0.35) && // SC and EC coincidence time -> MUST FIX
 	  SampFracCheck(tt) && // added sim cut, borquez_mod
 	  Etot(0) / 0.27 / 1.15 + 0.4 > Momentum(0) &&
 	  Etot(0) / 0.27 / 1.15 - 0.2 < Momentum(0) &&
@@ -89,24 +89,29 @@ TIdentificator::GetCategorization(Int_t k, const char* tt)
 	}
       }
       
-      // electrons in k > 0? 
-      if (Status(k) > 0 && Status(k) < 100 &&
-	  Charge(k) == -1 &&
-	  number_cc != 0 && number_ec != 0 && number_sc != 0 &&
+      // missed electrons in k > 0?
+      TVector3 *ECxyz_se = new TVector3(XEC(k), YEC(k), ZEC(k));
+      TVector3 *ECuvw_se = XYZToUVW(ECxyz_se);      
+      if (number_cc != 0 && number_ec != 0 && number_sc != 0 &&
 	  StatCC(k) > 0 && StatSC(k) > 0 &&
-	  StatDC(k) > 0 && StatEC(k) > 0 &&
-	  DCStatus(k) > 0 && SCStatus(k) == 33 &&
+	  StatEC(k) > 0 && SCStatus(k) == 33 &&
 	  Nphe(0) > (Sector(k)==0||Sector(k)==1)*25 // sector dependent cut
 	  +(Sector(k)==2)*26 
 	  +(Sector(k)==3)*21
 	  +(Sector(k)==4 || Sector(k)==5 )*28 &&
-	  Momentum(k) > 0.75 && // momentum triger added
+	  Momentum(k) > 0.64 && // momentum triger added, borquez_mode
 	  Ein(k) > 0.06 && // inner stack energy cut
 	  Etot(k) / 0.27 / 1.15 + 0.4 > Momentum(k) &&
 	  Etot(k) / 0.27 / 1.15 - 0.2 < Momentum(k) &&
 	  Ein(k) + Eout(k) > 0.8 * 0.27 * Momentum(k) &&
 	  Ein(k) + Eout(k) < 1.2 * 0.27 * Momentum(k) &&
-	  Eout(k) != 0) {
+	  Eout(k) > 0 &&
+	  ((TimeEC(k) - TimeSC(k) - (PathEC(k) - PathSC(k))/30) < 5*0.35) && // SC and EC coincidence time
+	  SampFracCheck(tt) && // added sim cut, borquez_mod
+	  ECuvw_se->X() > 40 && ECuvw_se->X() < 400 && // U coordinate in ]40,400[, EC fiducial cuts, borquez_mod
+	  ECuvw_se->Y() >= 0 && ECuvw_se->Y() < 360 && // V coordinate in [0,360[
+	  ECuvw_se->Z() >= 0 && ECuvw_se->Z() < 390 && // W coordinate in [0,390[
+	  FidCheckCut()) {
 	partId = "s_electron";
       }
       
