@@ -8,7 +8,7 @@ All the particle identification cuts are written in `src/Categorize.C`
 * Charge must be `-1`
 * Inner stack energy cut: `E_{in} > 0.06 GeV`
 * Momentum, `P > 0.64 GeV`
-* EC-SC coincidence time: `5 \sigma` (?)
+* EC-SC coincidence time: `5 \sigma` around a `(t_EC - t_SC)` distribution
 * CC Number of photoelectrons: sector dependent
 * EC Fiducial cut: `40 < U < 400, 0 < V < 360, 0 < W < 390`
 * DC Fiducial cut: extensive *(read code for more info)*

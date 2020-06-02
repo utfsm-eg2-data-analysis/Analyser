@@ -106,8 +106,8 @@ public:
   Double_t PmaxCM(Bool_t = 0);
 
   // Kinematic variables
-  Double_t Q2(Bool_t kind = 0);
-  Double_t W(Bool_t kind = 0);
+  Double_t Q2(Int_t k, Bool_t kind = 0); // borquez_mod
+  Double_t W(Int_t k, Bool_t kind = 0); // borquez_mod
   Double_t Nu(Bool_t kind = 0);
   Double_t Xb(Bool_t kind = 0);
   Double_t Yb(Bool_t kind = 0);
@@ -119,17 +119,15 @@ public:
   Double_t Mx2(Int_t, Bool_t = 0);
   Double_t T(Int_t, Bool_t = 0);
 
-
   // Correction functions
   Double_t TimeCorr4(Double_t mass, Int_t k);
   TVector3 *GetCorrectedVert();
-
 
   //Added in hayk's code
   //Int_t ElecVertTarg(Bool_t = 0);
 
   // Particle Identification cuts
-  TString GetCategorization(Int_t k, const char*tt = "");
+  TString GetCategorization(Int_t k, TString tt = "", Int_t testFlag = 0);
   TString GetCategorizationOld(Int_t k);
   TString GetCategorizationMin(Int_t k);
   TString GetCategorizationGSIM(Int_t k);
@@ -154,20 +152,20 @@ public:
   Bool_t FidCheckCutPiPlus(Int_t k);
   Int_t FidSector(Int_t k, Bool_t kind = 0);
 
-  //Target methods.
+  // Target methods
   Int_t ElecVertTarg();
   Int_t ElecVertTarg(Bool_t kind);
   Bool_t PionVertTarg(Int_t k);
 
-  //Other methods.
-  TVector3 *XYZToUVW(TVector3 *xyz);            //osoto add
-  bool SampFracCheck(const char* tt = "");                         // inline //osoto add 
+  // Other methods
+  TVector3 *XYZToUVW(TVector3 *xyz);   // osoto_mod
+  bool SampFracCheck(TString tt = ""); // inline osoto_mod 
 
 private:
   const Double_t kEbeam;    // The energy of incoming electron beam
   const Double_t kMpi;      // The mass of the pion
-  const Double_t kMprt; // The mass of the proton
-  const Double_t kMntr; // The mass of the neutron
+  const Double_t kMprt;     // The mass of the proton
+  const Double_t kMntr;     // The mass of the neutron
   const Double_t kGOOD;     // The key for the exceptions (should be improved to avoid it at all !!!)
 
   TClasTool *fCT;           // Pointer to the main ClasTool object

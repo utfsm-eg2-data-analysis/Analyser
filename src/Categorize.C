@@ -1,5 +1,5 @@
-TString TIdentificator::GetCategorization(Int_t k, const char* tt)
-{
+TString TIdentificator::GetCategorization(Int_t k, TString tt) {
+  
   Int_t number_dc = fCT->GetNRows("DCPB");
   Int_t number_cc = fCT->GetNRows("CCPB");
   Int_t number_sc = fCT->GetNRows("SCPB");
@@ -11,168 +11,125 @@ TString TIdentificator::GetCategorization(Int_t k, const char* tt)
   
   if (number_dc != 0) {
     
-    // row number = 0
-    if (k == 0) {
-      
-      // electrons
-      TVector3 *ECxyz_e = new TVector3(XEC(0), YEC(0), ZEC(0));
-      TVector3 *ECuvw_e = XYZToUVW(ECxyz_e);      
-      if (Status(0) > 0 && Status(0) < 100 &&
-	  Charge(0) == -1 &&
-	  number_cc != 0 && number_ec != 0 && number_sc != 0 &&
-	  StatCC(0) > 0 && StatSC(0) > 0 &&
-	  StatDC(0) > 0 && StatEC(0) > 0 &&
-	  DCStatus(0) > 0 && SCStatus(0) == 33 &&
-	  (Nphe(0) > (Sector(0)==0 || Sector(0)==1)*25 // sector dependent cut
-	   + (Sector(0)==2)*26 
-	   + (Sector(0)==3)*21
-	   + (Sector(0)==4 || Sector(0)==5)*28) &&
-	  Momentum(0) > 0.64 && // borquez_mod
-	  Ein(0) > 0.06 && // inner stack energy cut
-	  ((TimeEC(0) - TimeSC(0) - (PathEC(0) - PathSC(0))/30) < 5*0.35) && // SC and EC coincidence time -> MUST FIX
-	  SampFracCheck(tt) && // added sim cut, borquez_mod
-	  Etot(0) / 0.27 / 1.15 + 0.4 > Momentum(0) &&
-	  Etot(0) / 0.27 / 1.15 - 0.2 < Momentum(0) &&
-	  Ein(0) + Eout(0) > 0.8 * 0.27 * Momentum(0) &&
-	  Ein(0) + Eout(0) < 1.2 * 0.27 * Momentum(0) &&
-	  Eout(0) > 0 && // taya's a-note, borquez_mod
-	  ECuvw_e->X() > 40 && ECuvw_e->X() < 400 && // U coordinate in ]40,400[, EC fiducial cuts, borquez_mod
-	  ECuvw_e->Y() >= 0 && ECuvw_e->Y() < 360 && // V coordinate in [0,360[
-	  ECuvw_e->Z() >= 0 && ECuvw_e->Z() < 390 && // W coordinate in [0,390[
-	  FidCheckCut()) { // DC fiducial cuts
-	partId = "electron";
-      }
-      
-    // row number > 0
-    } else if (k > 0) {
-      
-      // neutral particles
-      if (Charge(k) == 0) {
+    // transformation from xyz to uvw
+    TVector3 *ECxyz = new TVector3(XEC(k), YEC(k), ZEC(k));
+    TVector3 *ECuvw = XYZToUVW(ECxyz);
+    
+    // define ID cuts
+    Bool_t ID_electron =
+      (Charge(k) == -1) &&
+      (Nphe(k) > (Sector(k)==0 || Sector(k)==1)*25 + (Sector(k)==2)*26 + (Sector(k)==3)*21 + (Sector(k)==4 || Sector(k)==5)*28) && // sector dependent cut
+      (Momentum(k) > 0.64) && // borquez_mod
+      (Ein(k) > 0.06) && // inner stack energy cut
+      (0.66 - 5*0.34 < TimeEC(k) - TimeSC(k)) && (TimeEC(k) - TimeSC(k) < 0.66 + 5*0.34) && // SC and EC coincidence time, borquez_mod
+      SampFracCheck(k, tt) && // added sim cut and iterator dependence, borquez_mod
+      (Etot(k) / 0.27 / 1.15 + 0.4 > Momentum(k)) &&
+      (Etot(k) / 0.27 / 1.15 - 0.2 < Momentum(k)) &&
+      (Ein(k) + Eout(k) > 0.8 * 0.27 * Momentum(k)) &&
+      (Ein(k) + Eout(k) < 1.2 * 0.27 * Momentum(k)) &&
+      (Eout(k) > 0) && // taya's a-note, borquez_mod
+      (40 < ECuvw->X()) && (ECuvw->X() < 400) && // U coordinate in ]40,400[, EC fiducial cuts, borquez_mod
+      (0 <= ECuvw->Y()) && (ECuvw->Y() < 360) && // V coordinate in [0,360[
+      (0 <= ECuvw->Z()) && (ECuvw->Z() < 390) && // W coordinate in [0,390[
+      FidCheckCut(); // DC fiducial cuts
+    
+    /* deprecated electron cuts:
+       Status(0) > 0 && Status(0) < 100 &&
+       number_cc != 0 && number_ec != 0 && number_sc != 0 &&
+       StatCC(0) > 0 && StatSC(0) > 0 &&
+       StatDC(0) > 0 && StatEC(0) > 0 &&
+       DCStatus(0) > 0 && SCStatus(0) == 33 */
+    
+    Bool_t ID_gamma =
+      (Charge(k) == 0) &&
+      (40 < ECuvw->X()) && (ECuvw->X() < 410) && // U coordinate in ]40,410[, EC fiducial cuts, borquez_mod
+      (0 <= ECuvw->Y()) && (ECuvw->Y() < 370) && // V coordinate in [0,370[
+      (0 <= ECuvw->Z()) && (ECuvw->Z() < 410) && // W coordinate in [0,410[
+      (-2.2 < PathEC(k)/(Betta(k)*30) - PathEC(k)/30) && // speed of light cut, orlando's thesis and taya's a-note, borquez_mod
+             (PathEC(k)/(Betta(k)*30) - PathEC(k)/30 < 1.3) &&
+      (TMath::Max(Etot(k), Ein(k)+Eout(k))/0.272 > 0.1); // orlando's thesis, borquez_mod
 
-	// photons
-	TVector3 *ECxyz = new TVector3(XEC(k), YEC(k), ZEC(k));
-	TVector3 *ECuvw = XYZToUVW(ECxyz);
-	if (ECuvw->X() > 40 && ECuvw->X() < 410 &&  // U coordinate in ]40,410[, EC fiducial cuts, borquez_mod
-	    ECuvw->Y() >= 0  && ECuvw->Y() < 370 && // V coordinate in [0,370[
-	    ECuvw->Z() >= 0  && ECuvw->Z() < 410 && // W coordinate in [0,410[
-	    PathEC(k)/(Betta(k)*30) - PathEC(k)/30 > -2.2 && // speed of light cut, orlando's thesis and taya's a-note, borquez_mod
-	    PathEC(k)/(Betta(k)*30) - PathEC(k)/30 < 1.3 &&
-	    TMath::Max(Etot(k), Ein(k)+Eout(k))/0.272 > 0.1) { // orlando's thesis, borquez_mod
-	  partId = "gamma";
-	}
-      }
-      
-      // negative particles
-      if (Charge(k) == -1 && Status(k) > 0 && Status(k) < 100 &&
-	  StatDC(k) > 0 && DCStatus(k) > 0) {
-	
-	Float_t P = Momentum(k);
-	Float_t T4 = TimeCorr4(0.1396, k);
-	
-	// negative pions
-	if (Etot(k) < 0.15 && Ein(k) < 0.085 - 0.5*Eout(k) &&
-	    ((
-	      (!(StatCC(k) > 0 && Nphe(k) > 25)) &&
-	      ( 
-	       (0 < P && P <= 0.5 && T4 > -0.87 && T4 < 0.63) ||
-	       (0.5 < P && P <= 1.0 && T4 > -0.55 && T4 < 0.37) ||
-	       (1.0 < P && P <= 1.5 && T4 > -0.55 && T4 < 0.38) ||
-	       (1.5 < P && P <= 2.0 && T4 > -0.60 && T4 < 0.44) ||
-	       (2.0 < P && P <= 2.5 && T4 > -1.00 && T4 < 0.45)
-		)
-	      )
-	     || (2.5 < P && P <= 3.0 && T4 > -1.00 && T4 < 0.40)
-	     || (3.0 < P && T4 > -2.00 && T4 < 0.45)
-	     )
-	    ) {
-	  partId = "pi-";
-	}
-      }
-      
-      // missed electrons in k > 0?
-      TVector3 *ECxyz_se = new TVector3(XEC(k), YEC(k), ZEC(k));
-      TVector3 *ECuvw_se = XYZToUVW(ECxyz_se);      
-      if (number_cc != 0 && number_ec != 0 && number_sc != 0 &&
-	  StatCC(k) > 0 && StatSC(k) > 0 &&
-	  StatEC(k) > 0 && SCStatus(k) == 33 &&
-	  Nphe(0) > (Sector(k)==0||Sector(k)==1)*25 // sector dependent cut
-	  +(Sector(k)==2)*26 
-	  +(Sector(k)==3)*21
-	  +(Sector(k)==4 || Sector(k)==5 )*28 &&
-	  Momentum(k) > 0.64 && // momentum triger added, borquez_mode
-	  Ein(k) > 0.06 && // inner stack energy cut
-	  Etot(k) / 0.27 / 1.15 + 0.4 > Momentum(k) &&
-	  Etot(k) / 0.27 / 1.15 - 0.2 < Momentum(k) &&
-	  Ein(k) + Eout(k) > 0.8 * 0.27 * Momentum(k) &&
-	  Ein(k) + Eout(k) < 1.2 * 0.27 * Momentum(k) &&
-	  Eout(k) > 0 &&
-	  ((TimeEC(k) - TimeSC(k) - (PathEC(k) - PathSC(k))/30) < 5*0.35) && // SC and EC coincidence time
-	  SampFracCheck(tt) && // added sim cut, borquez_mod
-	  ECuvw_se->X() > 40 && ECuvw_se->X() < 400 && // U coordinate in ]40,400[, EC fiducial cuts, borquez_mod
-	  ECuvw_se->Y() >= 0 && ECuvw_se->Y() < 360 && // V coordinate in [0,360[
-	  ECuvw_se->Z() >= 0 && ECuvw_se->Z() < 390 && // W coordinate in [0,390[
-	  FidCheckCut()) {
-	partId = "s_electron";
-      }
-      
-      // positive particles
-      if (Charge(k) == 1 &&
-	  Status(k) > 0 && Status(k) < 100 &&
-	  StatDC(k) > 0 && DCStatus(k) > 0) {
-	
-	// high energy positive pions
-	if (Momentum(k) >= 2.7) {
-	  if (number_cc != 0 && StatCC(k) > 0 &&
-	      Nphe(k) > 25 && Chi2CC(k) < 5 / 57.3)
-	    partId = "high energy pion +";
-	}
-	
-	// low energy positive pions
-	if (Momentum(k) < 2.7) {
-	  if (number_sc != 0 && StatSC(k) > 0 &&
-	      ((Momentum(k) > 0 && Momentum(k) <= 0.25 && TimeCorr4(0.139,k) >= -1.45 && TimeCorr4(0.139,k) <= 1.05) ||
-	       (Momentum(k) > 0.25 && Momentum(k) <= 0.5 && TimeCorr4(0.139,k) >= -1.44 && TimeCorr4(0.139,k) <= 1.05) || 
-	       (Momentum(k) > 0.5 && Momentum(k) <= 0.75 && TimeCorr4(0.139,k) >= -1.44 && TimeCorr4(0.139,k) <= 1.05) ||
-	       (Momentum(k) > 0.75 && Momentum(k) <= 1 && TimeCorr4(0.139,k) >= -1.4 && TimeCorr4(0.139,k) <= 1.05) ||
-	       (Momentum(k) > 1 && Momentum(k) <= 1.25 && TimeCorr4(0.139,k) >= -1.35 && TimeCorr4(0.139,k) <= 1.03) ||
-	       (Momentum(k) > 1.25 && Momentum(k) <= 1.5 && TimeCorr4(0.139,k) >= -1.35 && TimeCorr4(0.139,k) <= 0.95) ||
-	       (Momentum(k) > 1.5 && Momentum(k) <= 1.75 && TimeCorr4(0.139,k) >= -1.35 && TimeCorr4(0.139,k) <= 0.87) ||
-	       (Momentum(k) > 1.75 && Momentum(k) <= 2 && TimeCorr4(0.139,k) >= -1.25 && TimeCorr4(0.139,k) <= 0.68) ||
-	       (Momentum(k) > 2 && Momentum(k) <= 2.25 && TimeCorr4(0.139,k) >= -0.95 && TimeCorr4(0.139,k) <= 0.65) ||
-	       (Momentum(k) > 2.25 && Momentum(k) <= 2.5 && TimeCorr4(0.139,k) >= -1.05 && TimeCorr4(0.139,k) <= 0.61
-		&& Mass2(k) < 0.5) ||
-	       (Momentum(k) > 2.5 && Momentum(k) < 2.7 && TimeCorr4(0.139,k) >= -1.05 && TimeCorr4(0.139,k) <= 0.61
-		&& Mass2(k) < 0.4)))
-	    partId = "low energy pion +";
-	}
-	
-	// protons
-	if (Momentum(k) < 2.) {
-	  if (number_sc != 0 && StatSC(k) > 0 &&
-	      ((Momentum(k) >= 1. &&
-		TimeCorr4(0.938,k) >= -0.69 &&
-		TimeCorr4(0.938,k) <= 1.38) ||
-	       (Momentum(k) < 1. &&
-		TimeCorr4(0.938,k) >= -3.78 &&
-		TimeCorr4(0.938,k) <= 6.75)))
-	    partId = "low energy proton";
-	}
-	
-	// positrons
-	if (Charge(k) == 1 && number_cc != 0 &&
-	    number_ec != 0 && number_sc != 0 &&
-	    StatCC(k) > 0 && StatSC(k) > 0 &&
-	    StatDC(k) > 0 && StatEC(k) > 0 &&
-	    DCStatus(k) > 0 && Nphe(k) > 25 &&
-	    Etot(k) / 0.27 / 1.15 + 0.4 > Momentum(k) &&
-	    Etot(k) / 0.27 / 1.15 - 0.2 < Momentum(k) &&
-	    Ein(k) + Eout(k) > 0.8 * 0.27 * Momentum(k) &&
-	    Ein(k) + Eout(k) < 1.2 * 0.27 * Momentum(k))
-	  partId = "positron";
-      }
-      
+    // just to shorten a little
+    Float_t P = Momentum(k);
+    Float_t T4 = TimeCorr4(0.1396, k);
+    
+    Bool_t ID_pim =
+      (Charge(k) == -1) &&
+      (Etot(k) < 0.15) &&
+      (Ein(k) < 0.085 - 0.5*Eout(k)) &&
+      ((Nphe(k) < 25 && ((0 < P && P <= 0.5 && T4 > -0.87 && T4 < 0.63) ||
+			 (0.5 < P && P <= 1.0 && T4 > -0.55 && T4 < 0.37) ||
+			 (1.0 < P && P <= 1.5 && T4 > -0.55 && T4 < 0.38) ||
+			 (1.5 < P && P <= 2.0 && T4 > -0.60 && T4 < 0.44) ||
+			 (2.0 < P && P <= 2.5 && T4 > -1.00 && T4 < 0.45))) ||
+       (2.5 < P && P <= 3.0 && T4 > -1.00 && T4 < 0.40) ||
+       (3.0 < P && T4 > -2.00 && T4 < 0.45)
+       );
+
+    /* deprecated pim cuts:
+       Status(k) > 0 && Status(k) < 100 && StatDC(k) > 0 && DCStatus(k) > 0 */
+    /* deprecated low energy pim cuts (P <= 2.5):
+       StatCC(k) > 0 */
+    
+    Bool_t ID_pip =
+	      (Charge(k) == 1) &&
+	      (((P >= 2.7) && (Nphe(k) > 25)) ||
+	       ((P < 2.7) && ((P > 0 && P <= 0.25 && T4 >= -1.45 && T4 <= 1.05) ||
+			      (P > 0.25 && P <= 0.5 && T4 >= -1.44 && T4 <= 1.05) || 
+			      (P > 0.5 && P <= 0.75 && T4 >= -1.44 && T4 <= 1.05) ||
+			      (P > 0.75 && P <= 1 && T4 >= -1.4 && T4 <= 1.05) ||
+			      (P > 1 && P <= 1.25 && T4 >= -1.35 && T4 <= 1.03) ||
+			      (P > 1.25 && P <= 1.5 && T4 >= -1.35 && T4 <= 0.95) ||
+			      (P > 1.5 && P <= 1.75 && T4 >= -1.35 && T4 <= 0.87) ||
+			      (P > 1.75 && P <= 2 && T4 >= -1.25 && T4 <= 0.68) ||
+			      (P > 2 && P <= 2.25 && T4 >= -0.95 && T4 <= 0.65) ||
+			      (P > 2.25 && P <= 2.5 && T4 >= -1.05 && T4 <= 0.61 && Mass2(k) < 0.5) ||
+			      (P > 2.5 && P < 2.7 && T4 >= -1.05 && T4 <= 0.61 && Mass2(k) < 0.4))));
+
+    /* deprecated pip cuts:
+       Status(k) > 0 && Status(k) < 100 && StatDC(k) > 0 && DCStatus(k) > 0 */
+    /* deprecated low energy pip cuts: 
+       number_cc != 0 && StatCC(k) > 0 && Chi2CC(k) < 5./57.3 */
+    /* deprecated high energy pip cuts:
+       number_sc != 0 && StatSC(k) > 0 */
+    
+    Bool_t ID_positron =
+      (Charge(k) == 1) &&
+      (Nphe(k) > 25) &&
+      (Etot(k)/0.27/1.15 + 0.4 > Momentum(k)) &&
+						      (Etot(k)/0.27/1.15 - 0.2 < Momentum(k)) &&
+      (Ein(k) + Eout(k) > 0.8 * 0.27 * Momentum(k)) &&
+						      (Ein(k) + Eout(k) < 1.2 * 0.27 * Momentum(k));
+    
+    /* deprecated positron cuts:
+       number_cc != 0 && number_ec != 0 && number_sc != 0 &&
+       StatCC(k) > 0 && StatSC(k) > 0 && StatDC(k) > 0 && StatEC(k) > 0 && DCStatus(k) > 0 */
+    /* commentary:
+       all positron cuts should be the same as electron cuts, but the charge */
+    
+    Bool_t ID_proton =
+      (Charge(k) == 1) &&
+      ((Momentum(k) >= 1. && Momentum(k) < 2. && TimeCorr4(0.938,k) >= -0.69 && TimeCorr4(0.938,k) <= 1.38) ||
+       (Momentum(k) < 1. && TimeCorr4(0.938,k) >= -3.78 && TimeCorr4(0.938,k) <= 6.75));
+
+    /* deprecated proton cuts:
+       number_sc != 0 && StatSC(k) > 0 */
+
+    if (ID_electron) { // DC fiducial cuts
+      partId = "electron";
+    } else if (ID_gamma) {
+      partId = "gamma";
+    } else if (ID_pim) {
+      partId = "pi-";
+    } else if (ID_pip) {
+      partId = "pi+";      
+    } else if (ID_positron) {
+      partId = "positron";
+    } else if (ID_proton) {
+      partId = "proton";
     }
-  }
+ 
+  } // end of number_dc != 0 condition
   
   return partId;
 }

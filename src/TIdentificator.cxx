@@ -1,16 +1,17 @@
-#include "TIdentificator.h"
-#include "massConst.h"
 #include <string.h>
 #include <stdio.h>
 #include <iostream>
 #include <math.h>
+
+#include "TIdentificator.h"
+#include "massConst.h"
 
 using namespace std;
 
 const Double_t kFidThetaMax = 54;
 
 // For FidThetaMin calculation for electron
-const Double_t kThetaPar0[6] = { 15        , 15        ,  15       , 15        ,  13       ,  13        };
+const Double_t kThetaPar0[6] = { 15        , 15        , 15        , 15        ,  13       ,  13        };
 const Double_t kThetaPar1[6] = { -0.425145 , -1.02217  , -0.7837   , -1.47798  ,   3.47361 ,   3.5714   };
 const Double_t kThetaPar2[6] = { -0.666294 , -0.616567 , -0.673602 , -0.647113 ,  -0.34459 ,  -0.398458 };
 const Double_t kThetaPar3[6] = {  5.73077  ,  5.51799  ,  8.05224  ,  7.74737  ,   8.45226 ,   9.54265  };
@@ -21,7 +22,7 @@ const Double_t kThetaPar5[6] = { -1.13254  , -1.16189  , -2.08386  , -1.79939  ,
 const Double_t kFidPar0Low0[6] = {  25      ,  25        ,  25       ,  24.6345  ,  23.4731  ,  24.8599  };
 const Double_t kFidPar0Low1[6] = { -12      , -12        , -12       , -12       , -12       , -12       };
 const Double_t kFidPar0Low2[6] = {   0.5605 ,   0.714261 ,  0.616788 ,   0.62982 ,   1.84236 ,   1.00513 };
-const Double_t kFidPar0Low3[6] = {  4.4     ,  4.4       ,  4.4      ,   4.4     ,   4.4     ,   4.4     };
+const Double_t kFidPar0Low3[6] = {   4.4    ,   4.4      ,  4.4      ,   4.4     ,   4.4     ,   4.4     };
 
 // For parameter 1 of the FidPhiMin calculation for electron
 const Double_t kFidPar1Low0[6] = {  2.1945   ,  4        ,  3.3352  ,  2.22769   ,  1.63143   ,  3.19807  };
@@ -158,8 +159,7 @@ Double_t TIdentificator::Mass2(Int_t k, Bool_t kind)
   }
 }
 
-Double_t TIdentificator::ThetaLab(Int_t k, Bool_t kind)
-{
+Double_t TIdentificator::ThetaLab(Int_t k, Bool_t kind) {
   // Return the polar angle in Lab frame for the particle in the row k of
   // the EVNT bank.
   //
@@ -168,11 +168,10 @@ Double_t TIdentificator::ThetaLab(Int_t k, Bool_t kind)
   
   Double_t theta_val;
   
-  if (kind == 0)
-    {
-      TVector3 v3p(Px(k), Py(k), Pz(k));
-      theta_val = v3p.Theta() * 180. / TMath::Pi();
-    } else {                            // Fix this in case k != 1
+  if (kind == 0) {
+    TVector3 v3p(Px(k), Py(k), Pz(k));
+    theta_val = v3p.Theta() * 180. / TMath::Pi();
+  } else {                            // Fix this in case k != 1
     TVector3 v3p(Px(k,1), Py(k,1), Pz(k,1));
     theta_val = v3p.Theta() * 180. / TMath::Pi();
   }
@@ -180,8 +179,7 @@ Double_t TIdentificator::ThetaLab(Int_t k, Bool_t kind)
   return theta_val;
 }
 
-Double_t TIdentificator::PhiLab(Int_t k, Bool_t kind)
-{
+Double_t TIdentificator::PhiLab(Int_t k, Bool_t kind) {
   // Return the azimuthal angle in Lab frame for the particle in the row k
   // of the EVNT bank.
   //
@@ -236,8 +234,7 @@ Double_t TIdentificator::PhiVirtLab(Bool_t kind) // Check if it is correct !!!
     return (180.+PhiLab(0,kind));
 }
 
-Double_t TIdentificator::ThetaPQ(Int_t k, Bool_t kind)
-{
+Double_t TIdentificator::ThetaPQ(Int_t k, Bool_t kind) {
   // Return the polar angle of the born particle in respect to virtual
   // photon direction, for the particle in the row k of the EVNT bank. It
   // doesn't apply for electron.
@@ -246,12 +243,11 @@ Double_t TIdentificator::ThetaPQ(Int_t k, Bool_t kind)
   // instead.
   
   Double_t theta_pq;
-  if(kind==0){
+  if (kind == 0) {
     TVector3 Vpi(Px(k),Py(k),Pz(k));
     TVector3 Vvirt(-Px(0),-Py(0),kEbeam-Pz(0));
     theta_pq=Vvirt.Angle(Vpi)*180./(TMath::Pi());
-  }
-  else {
+  } else {
     TVector3 Vpi(Px(k,1),Py(k,1),Pz(k,1));
     TVector3 Vvirt(-Px(0,1),-Py(0,1),kEbeam-Pz(0,1));
     theta_pq=Vvirt.Angle(Vpi)*180./(TMath::Pi());
@@ -259,8 +255,7 @@ Double_t TIdentificator::ThetaPQ(Int_t k, Bool_t kind)
   return theta_pq;
 }
 
-Double_t TIdentificator::PhiPQ(Int_t k, Bool_t kind)
-{
+Double_t TIdentificator::PhiPQ(Int_t k, Bool_t kind) {
   // Return the azimuthal angle of the born particle in respect to virtual
   // photon direction, for the particle in the row k of the EVNT bank. It
   // doesn't apply for electron.
@@ -296,8 +291,7 @@ Double_t TIdentificator::PhiPQ(Int_t k, Bool_t kind)
   return phi_pq;
 }
 
-Double_t TIdentificator::CosThetaPQ(Int_t k, Bool_t kind)
-{
+Double_t TIdentificator::CosThetaPQ(Int_t k, Bool_t kind) {
   // Return the cosine of ThetaPQ, for the particle in the row k of the EVNT
   // bank. It doesn't apply for electron.
   //
@@ -313,8 +307,7 @@ Double_t TIdentificator::CosThetaPQ(Int_t k, Bool_t kind)
       (sqrt(Nu(1) * Nu(1) + Q2(1)) * Momentum(k,1));
 }
 
-Double_t TIdentificator::Pt2(Int_t k, Bool_t kind)
-{
+Double_t TIdentificator::Pt2(Int_t k, Bool_t kind) {
   if (kind == 0)
     return Momentum(k) * Momentum(k) *
       (1 - CosThetaPQ(k) * CosThetaPQ(k));
@@ -323,32 +316,28 @@ Double_t TIdentificator::Pt2(Int_t k, Bool_t kind)
       (1 - CosThetaPQ(k,1) * CosThetaPQ(k,1));
 }
 
-Double_t TIdentificator::Pl2(Int_t k, Bool_t kind)
-{
+Double_t TIdentificator::Pl2(Int_t k, Bool_t kind) {
   if (kind == 0)
     return Momentum(k) * Momentum(k) * CosThetaPQ(k) * CosThetaPQ(k);
   else                                // Fix this in case k != 1
     return Momentum(k,1) * Momentum(k,1) * CosThetaPQ(k,1) * CosThetaPQ(k,1);
 }
 
-Double_t TIdentificator::PlCM(Int_t k, Bool_t kind)
-{
+Double_t TIdentificator::PlCM(Int_t k, Bool_t kind) {
   if (kind == 0)
     return (Nu() + kMprt) * (TMath::Sqrt(Pl2(k)) - TMath::Sqrt(Q2() + Nu() * Nu()) * Zh(k) * Nu() / (Nu() + kMprt)) / W();
   else                                // Fix this in case k != 1
     return (Nu(1) + kMprt) * (TMath::Sqrt(Pl2(k,1)) - TMath::Sqrt(Q2(1) + Nu(1) * Nu(1)) * Zh(k,1) * Nu(1) / (Nu(1) + kMprt)) / W(1);
 }
 
-Double_t TIdentificator::PmaxCM(Bool_t kind)
-{
+Double_t TIdentificator::PmaxCM(Bool_t kind) {
   if (kind == 0)
     return TMath::Sqrt(TMath::Power(W() * W() - kMntr * kMntr + kMpi * kMpi, 2) - 4. * kMpi * kMpi * W() * W()) / 2. / W();
   else                                // Fix this in case k != 1
     return TMath::Sqrt(TMath::Power(W(1) * W(1) - kMntr * kMntr + kMpi * kMpi, 2) - 4. * kMpi * kMpi * W(1) * W(1)) / 2. / W(1);
 }
 
-Double_t TIdentificator::PTrans2PQ(Int_t k, Bool_t kind)
-{
+Double_t TIdentificator::PTrans2PQ(Int_t k, Bool_t kind) {
   // Return the momentum transverse component squared of the born particle
   // in respect to virtual photon direction, for the particle in the row k
   // of the EVNT bank. It doesn't apply for electron.
@@ -364,8 +353,7 @@ Double_t TIdentificator::PTrans2PQ(Int_t k, Bool_t kind)
       (1 - CosThetaPQ(k,1) * CosThetaPQ(k,1));
 }
 
-Double_t TIdentificator::PLong2PQ(Int_t k, Bool_t kind)
-{
+Double_t TIdentificator::PLong2PQ(Int_t k, Bool_t kind) {
   // Return the momentum longitudinal component squared of the born particle
   // in respect to virtual photon direction, for the particle in the row k
   // of the EVNT bank. It doesn't apply for electron.
@@ -398,77 +386,84 @@ Int_t TIdentificator::Sector(Int_t k, Bool_t kind) // Check if it is correct !!!
   }
 }
 
-Double_t TIdentificator::Q2(Bool_t kind)
-{
+Double_t TIdentificator::Q2(Int_t ek, Bool_t kind) {
+  
   // Return the four-momentum transfer of the electron-nucleon interaction.
+  // For the electron in the row ek of the EVNT bank.
   //
   // If kind is zero, the EVNT bank is used. If not, the GSIM bank is used
   // instead.
+  
   if (kind == 0) {
-    return 4. * kEbeam * Momentum(0) *
-      sin(ThetaLab(0)*TMath::Pi()/180./2) * sin(ThetaLab(0)*TMath::Pi()/180./2);
+    return 4. * kEbeam * Momentum(ek) *
+      sin(ThetaLab(k)*TMath::Pi()/180./2) * sin(ThetaLab(ek)*TMath::Pi()/180./2);
   } else {                            // Fix this in case k != 1
-    return 4. * kEbeam * Momentum(0,1) *
-      sin(ThetaLab(0,1)*TMath::Pi()/180./2) * sin(ThetaLab(0,1)*TMath::Pi()/180./2);
+    return 4. * kEbeam * Momentum(ek,1) *
+      sin(ThetaLab(k,1)*TMath::Pi()/180./2) * sin(ThetaLab(ek,1)*TMath::Pi()/180./2);
   }
 }
 
-Double_t TIdentificator::W(Bool_t kind)
-{
+Double_t TIdentificator::W(Int_t ek, Bool_t kind) {
+  
   // Return the invariant mass of the electron-nucleon interaction.
   //
   // If kind is zero, the EVNT bank is used. If not, the GSIM bank is used
   // instead.
   
   if (kind == 0) {
-    return TMath::Sqrt(kMprt * kMprt + 2. * kMprt * Nu() - Q2());
+    return TMath::Sqrt(kMprt * kMprt + 2. * kMprt * Nu(ek) - Q2(ek));
   } else {                            // Fix this in case k != 1
-    return TMath::Sqrt(kMprt * kMprt + 2. * kMprt * Nu(1) - Q2(1));
+    return TMath::Sqrt(kMprt * kMprt + 2. * kMprt * Nu(ek,1) - Q2(ek,1));
   }
 }
 
-Double_t TIdentificator::Nu(Bool_t kind)
-{
+Double_t TIdentificator::Nu(Int_t ek, Bool_t kind) {
+  
   // Return the energy transfer of the electron-nucleon interaction.
   //
   // If kind is zero, the EVNT bank is used. If not, the GSIM bank is used
   // instead.
   
   if (kind == 0) {
-    return kEbeam - Momentum(0);
+    return kEbeam - Momentum(ek);
   } else {                            // Fix this in case k != 1
-    return kEbeam - Momentum(0,1);
+    return kEbeam - Momentum(ek,1);
   }
 }
 
-Double_t TIdentificator::Xb(Bool_t kind)
-{
+Double_t TIdentificator::Xb(Int_t k, Bool_t kind) {
+  
+  // Return the energy transfer of the electron-nucleon interaction.
+  //
+  // If kind is zero, the EVNT bank is used. If not, the GSIM bank is used
+  // instead.
+  
   if (kind == 0) {
-    return Q2() / 2. / Nu() / kMprt;
+    return Q2(ek) / 2. / Nu(ek) / kMprt;
   } else {                            // Fix this in case k != 1
-    return Q2(1) / 2. / Nu(1) / kMprt;
+    return Q2(ek,1) / 2. / Nu(ek,1) / kMprt;
   }
 }
 
-Double_t TIdentificator::Yb(Bool_t kind) /**/
-{
-  /*if (kind == 0)
-    return Nu(0) / kEbeam;
-    else
-    return Nu(1) / kEbeam;*/
+Double_t TIdentificator::Yb(Int_t ek, Bool_t kind) {
+
+  // Return the energy transfer of the electron-nucleon interaction.
+  //
+  // If kind is zero, the EVNT bank is used. If not, the GSIM bank is used
+  // instead.
+  
   if (kind == 0) {
-    return Nu() / kEbeam;
+    return Nu(ek) / kEbeam;
   } else {                            // Fix this in case k != 1
-    return Nu() / kEbeam;
+    return Nu(ek, 1) / kEbeam;
   }        
 }
 
-Double_t TIdentificator::Zh(Int_t k, Bool_t kind, Double_t Mass)
-{
+Double_t TIdentificator::Zh(Int_t k, Bool_t kind, Double_t Mass) {
   if (kind == 0)
-    return sqrt(Mass * Mass + Momentum(k) * Momentum(k)) / Nu();
+    return TMath::Sqrt(Mass * Mass + Momentum(k) * Momentum(k)) / Nu();
   else                                // Fix this in case k != 1
-    return sqrt(Mass * Mass + Momentum(k,1) * Momentum(k,1)) / Nu(1);
+    return TMath::Sqrt(Mass * Mass + Momentum(k,1) * Momentum(k,1)) / Nu(1);
 }
 
 Double_t TIdentificator::Xf(Int_t k, Bool_t kind)
@@ -487,8 +482,7 @@ Double_t TIdentificator::Mx2(Int_t k, Bool_t kind)
     return W(1) * W(1) - 2. * Nu(1) * Zh(k,1) * (Nu(1) + kMprt) + kMpi * kMpi + 2. * TMath::Sqrt((Q2(1) + Nu(1) * Nu(1)) * Pl2(k,1));
 }
 
-Double_t TIdentificator::T(Int_t k, Bool_t kind)
-{
+Double_t TIdentificator::T(Int_t k, Bool_t kind) {
   if (kind == 0)
     return 2. * TMath::Sqrt((Nu() * Nu() + Q2()) * Pl2(k)) + kMpi * kMpi - Q2() - 2. * Nu() * Nu() * Zh(k);
   else                                // Fix this in case k != 1
@@ -509,9 +503,11 @@ Double_t TIdentificator::ZhPi(Int_t k, Double_t Mass, Bool_t kind) // name needs
     return sqrt(Mass * Mass + Momentum(k,1) * Momentum(k,1)) / Nu(1);
 }
 
-Double_t TIdentificator::TimeCorr4(Double_t mass, Int_t k)
-{
-  return (PathSC(0)/30.) - TimeSC(0) + TimeSC(k) - 0.08 - (PathSC(k) / 30.) * sqrt(pow(mass/Momentum(k),2) + 1);
+Double_t TIdentificator::TimeCorr4(Double_t mass, Int_t k) {
+
+  // Time correction
+  
+  return (PathSC(0)/30.) - TimeSC(0) + TimeSC(k) - 0.08 - (PathSC(k) / 30.) * TMath::Sqrt(pow(mass/Momentum(k),2) + 1);
 }
 
 Double_t TIdentificator::FidTheta(Int_t k, Bool_t kind)
@@ -693,9 +689,10 @@ Double_t TIdentificator::FidPhiMaxPiPlus(Int_t k)
   return fid_phi_max_val;
 }
 
-Bool_t TIdentificator::FidCheckCut()
-{
+Bool_t TIdentificator::FidCheckCut() {
+  
   // Checks extensive DC fiducial cut for electrons
+  
   if (FidTheta(0) > FidThetaMin() && FidPhi(0) > FidPhiMin() && FidPhi(0) < FidPhiMax())
     return 1;
   else
@@ -741,6 +738,9 @@ Int_t TIdentificator::FidSector(Int_t k, Bool_t kind)
 }
 
 Int_t TIdentificator::ElecVertTarg() {
+
+  // Equivalent to ElecVerTarg(0), just below
+  
   Int_t p_vertex_cut_elec = 0;
   Double_t ele_liq_lim[6][2];
   Double_t ele_sol_low[6];
