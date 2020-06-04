@@ -7,7 +7,7 @@
     extern const Double_t kMassPi_min = 0.13957018;
     extern const Double_t kMassPi_zero = 0.1349766;
     extern const Double_t kMassKaon_plus = 0.493667;
-    extern const Double_t kMassKaon_min =0.493667;
+    extern const Double_t kMassKaon_min = 0.493667;
     extern const Double_t kMassKaon_zero = 0.497648;
     extern const Double_t kMassMeu = 0.10565836;
     extern const Double_t kMassAntiMeu = 0.10565836;

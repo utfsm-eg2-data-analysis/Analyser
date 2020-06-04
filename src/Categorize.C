@@ -1,4 +1,4 @@
-TString TIdentificator::GetCategorization(Int_t k, TString tt) {
+TString TIdentificator::GetCategorization(Int_t k, Int_t ke, TString tt) {
   
   Int_t number_dc = fCT->GetNRows("DCPB");
   Int_t number_cc = fCT->GetNRows("CCPB");
@@ -31,7 +31,7 @@ TString TIdentificator::GetCategorization(Int_t k, TString tt) {
       (40 < ECuvw->X()) && (ECuvw->X() < 400) && // U coordinate in ]40,400[, EC fiducial cuts, borquez_mod
       (0 <= ECuvw->Y()) && (ECuvw->Y() < 360) && // V coordinate in [0,360[
       (0 <= ECuvw->Z()) && (ECuvw->Z() < 390) && // W coordinate in [0,390[
-      FidCheckCut(); // DC fiducial cuts
+      FidCheckCut(k); // DC fiducial cuts
     
     /* deprecated electron cuts:
        Status(0) > 0 && Status(0) < 100 &&
@@ -39,6 +39,11 @@ TString TIdentificator::GetCategorization(Int_t k, TString tt) {
        StatCC(0) > 0 && StatSC(0) > 0 &&
        StatDC(0) > 0 && StatEC(0) > 0 &&
        DCStatus(0) > 0 && SCStatus(0) == 33 */
+
+    if (ID_electron) {
+      partId = "electron";
+      return partId;
+    }
     
     Bool_t ID_gamma =
       (Charge(k) == 0) &&
@@ -47,12 +52,17 @@ TString TIdentificator::GetCategorization(Int_t k, TString tt) {
       (0 <= ECuvw->Z()) && (ECuvw->Z() < 410) && // W coordinate in [0,410[
       (-2.2 < PathEC(k)/(Betta(k)*30) - PathEC(k)/30) && // speed of light cut, orlando's thesis and taya's a-note, borquez_mod
              (PathEC(k)/(Betta(k)*30) - PathEC(k)/30 < 1.3) &&
-      (TMath::Max(Etot(k), Ein(k)+Eout(k))/0.272 > 0.1); // orlando's thesis, borquez_mod
+      (TMath::Max(Etot(k), Ein(k)+Eout(k))/0.272 > 0.3); // taya's analysis note, borquez_mod
 
     // just to shorten a little
     Float_t P = Momentum(k);
-    Float_t T4 = TimeCorr4(0.1396, k);
-    
+    Float_t T4 = TimeCorr4(k, ke, 0.1396); // charged pion mass
+
+    if (ID_gamma) {
+      partId = "gamma";
+      return partId;
+    }
+
     Bool_t ID_pim =
       (Charge(k) == -1) &&
       (Etot(k) < 0.15) &&
@@ -70,6 +80,11 @@ TString TIdentificator::GetCategorization(Int_t k, TString tt) {
        Status(k) > 0 && Status(k) < 100 && StatDC(k) > 0 && DCStatus(k) > 0 */
     /* deprecated low energy pim cuts (P <= 2.5):
        StatCC(k) > 0 */
+
+    if (ID_pim) {
+      partId = "pi-";
+      return partId;
+    }
     
     Bool_t ID_pip =
 	      (Charge(k) == 1) &&
@@ -92,6 +107,12 @@ TString TIdentificator::GetCategorization(Int_t k, TString tt) {
        number_cc != 0 && StatCC(k) > 0 && Chi2CC(k) < 5./57.3 */
     /* deprecated high energy pip cuts:
        number_sc != 0 && StatSC(k) > 0 */
+
+    if (ID_pip) {
+      partId = "pi+";
+      return partId;
+    }
+
     
     Bool_t ID_positron =
       (Charge(k) == 1) &&
@@ -106,34 +127,31 @@ TString TIdentificator::GetCategorization(Int_t k, TString tt) {
        StatCC(k) > 0 && StatSC(k) > 0 && StatDC(k) > 0 && StatEC(k) > 0 && DCStatus(k) > 0 */
     /* commentary:
        all positron cuts should be the same as electron cuts, but the charge */
+
+    if (ID_positron) {
+      partId = "positron";
+      return partId;
+    }
     
     Bool_t ID_proton =
       (Charge(k) == 1) &&
-      ((Momentum(k) >= 1. && Momentum(k) < 2. && TimeCorr4(0.938,k) >= -0.69 && TimeCorr4(0.938,k) <= 1.38) ||
-       (Momentum(k) < 1. && TimeCorr4(0.938,k) >= -3.78 && TimeCorr4(0.938,k) <= 6.75));
+      ((Momentum(k) >= 1. && Momentum(k) < 2. && TimeCorr4(k,ke,0.938) >= -0.69 && TimeCorr4(k,ke,0.938) <= 1.38) ||
+       (Momentum(k) < 1. && TimeCorr4(k,ke,0.938) >= -3.78 && TimeCorr4(k,ke,0.938) <= 6.75));
 
     /* deprecated proton cuts:
        number_sc != 0 && StatSC(k) > 0 */
 
-    if (ID_electron) { // DC fiducial cuts
-      partId = "electron";
-    } else if (ID_gamma) {
-      partId = "gamma";
-    } else if (ID_pim) {
-      partId = "pi-";
-    } else if (ID_pip) {
-      partId = "pi+";      
-    } else if (ID_positron) {
-      partId = "positron";
-    } else if (ID_proton) {
+    if (ID_proton) {
       partId = "proton";
+      return partId;
     }
  
-  } // end of number_dc != 0 condition
+  } else { // end of number_dc != 0 condition
   
-  return partId;
+    return partId;
+  }
 }
-
+/*
 TString* TIdentificator::GetCategorization()
 {
     Int_t number = fCT->GetNRows("EVNT");
@@ -148,7 +166,8 @@ TString* TIdentificator::GetCategorization()
 
     return fPartIds;
 }
-
+*/
+ /*
 void TIdentificator::PrintCategorization()
 {
     Int_t number = fCT->GetNRows("EVNT");
@@ -160,7 +179,8 @@ void TIdentificator::PrintCategorization()
         cout << endl;
     }
 }
-
+ */
+/*
 void TIdentificator::PrintCategorization(TString* partIds)
 {
     Int_t number = fCT->GetNRows("EVNT");
@@ -171,19 +191,22 @@ void TIdentificator::PrintCategorization(TString* partIds)
         cout << endl;
     }
 }
+*/
+/*
+TString TIdentificator::GetCategorizationMin(Int_t k) {
 
-TString TIdentificator::GetCategorizationMin(Int_t k)
-{
-    Int_t number_dc = fCT->GetNRows("DCPB");
-    Int_t number_cc = fCT->GetNRows("CCPB");
-    Int_t number_sc = fCT->GetNRows("SCPB");
-    Int_t number_ec = fCT->GetNRows("ECPB");
-
-    TString partId;
-
-    partId = "not recognized";
-
-    if (number_dc != 0) 
+  // deprecated, stays here for historical reasons
+  
+  Int_t number_dc = fCT->GetNRows("DCPB");
+  Int_t number_cc = fCT->GetNRows("CCPB");
+  Int_t number_sc = fCT->GetNRows("SCPB");
+  Int_t number_ec = fCT->GetNRows("ECPB");
+  
+  TString partId;
+  
+  partId = "not recognized";
+  
+  if (number_dc != 0) 
     {
       if (k == 0 &&
           Status(0) > 0 &&
@@ -196,58 +219,58 @@ TString TIdentificator::GetCategorizationMin(Int_t k)
           DCStatus(0) > 0 &&
 	  ECStatus(0) > 0 && SCStatus(0)>0
           )
-          {
-            partId = "electron";
-          }
+	{
+	  partId = "electron";
+	}
 
-        //positive particles
+      //positive particles
       if (k > 0) 
-      {
-        if (Charge(k) == 1 && Status(k) > 0 && Status(k) < 100 &&
-                        StatDC(k) > 0 && DCStatus(k) > 0 && FidCheckCutPiPlus(k) == 1) 
-        {
-          if (Momentum(k)>=2.7) 
-          {
-            if (number_cc != 0 && StatCC(k) > 0 && Nphe(k) > 25 && Chi2CC(k) < 5 / 57.3)
-                        partId = "high energy pion +";
-          }
+	{
+	  if (Charge(k) == 1 && Status(k) > 0 && Status(k) < 100 &&
+	      StatDC(k) > 0 && DCStatus(k) > 0 && FidCheckCutPiPlus(k) == 1) 
+	    {
+	      if (Momentum(k)>=2.7) 
+		{
+		  if (number_cc != 0 && StatCC(k) > 0 && Nphe(k) > 25 && Chi2CC(k) < 5 / 57.3)
+		    partId = "high energy pion +";
+		}
 
-          if (Momentum(k) < 2.7) 
-          {
-            if (number_sc != 0 && StatSC(k) > 0 && TimeCorr4(0.139,k) <= 0.55)
-              partId = "low energy pion +";
-          }
+	      if (Momentum(k) < 2.7) 
+		{
+		  if (number_sc != 0 && StatSC(k) > 0 && TimeCorr4(0.139,k) <= 0.55)
+		    partId = "low energy pion +";
+		}
 
-        }
-        if (Status(k) > 0 && Status(k) < 100&&
-            Charge(k) == 1 && number_cc != 0 && number_ec != 0 && number_sc != 0 &&
-            StatCC(k) > 0 && StatSC(k) > 0 &&
-            StatDC(k) > 0 && StatEC(k) > 0 &&
-            DCStatus(k) > 0)
+	    }
+	  if (Status(k) > 0 && Status(k) < 100&&
+	      Charge(k) == 1 && number_cc != 0 && number_ec != 0 && number_sc != 0 &&
+	      StatCC(k) > 0 && StatSC(k) > 0 &&
+	      StatDC(k) > 0 && StatEC(k) > 0 &&
+	      DCStatus(k) > 0)
             partId = "positron";
-        // Gamma ID
-        if (Charge(k) == 0 )
-          { 
-            TVector3 *ECxyz = new TVector3(XEC(k),YEC(k),ZEC(k));
-            TVector3 *ECuvw = XYZToUVW(ECxyz);
-            if(ECuvw->X()>40 && ECuvw->X()<410 && // u coordinate in ]40,410[
-              ECuvw->Y()<370 && // v coordinate in [0,370[
-              ECuvw->Z()<410 && // w coordinate in [0,410[
-              PathEC(k)/(Betta(k)*30) - PathEC(k)/30>-2.2&&
-              PathEC(k)/(Betta(k)*30) - PathEC(k)/30<1.3&&
-              TMath::Max(Etot(k), Ein(k)+Eout(k))/0.273>0.1
-              )
-              {
-                partId = "gamma";
-              }
+	  // Gamma ID
+	  if (Charge(k) == 0 )
+	    { 
+	      TVector3 *ECxyz = new TVector3(XEC(k),YEC(k),ZEC(k));
+	      TVector3 *ECuvw = XYZToUVW(ECxyz);
+	      if(ECuvw->X()>40 && ECuvw->X()<410 && // u coordinate in ]40,410[
+		 ECuvw->Y()<370 && // v coordinate in [0,370[
+		 ECuvw->Z()<410 && // w coordinate in [0,410[
+		 PathEC(k)/(Betta(k)*30) - PathEC(k)/30>-2.2&&
+		 PathEC(k)/(Betta(k)*30) - PathEC(k)/30<1.3&&
+		 TMath::Max(Etot(k), Ein(k)+Eout(k))/0.273>0.1
+		 )
+		{
+		  partId = "gamma";
+		}
           
-        }
-      }
+	    }
+	}
     }
 
-    return partId;
+  return partId;
 }
-    
+*/    
 TString TIdentificator::GetCategorizationGSIM(Int_t k) {
   // recalls the particle ID from the GSIM bank
   TString partId;

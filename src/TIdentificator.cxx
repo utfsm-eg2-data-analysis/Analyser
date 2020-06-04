@@ -126,14 +126,15 @@ TIdentificator::TIdentificator(TClasTool *CT)
   this->fCT = CT;    
 }
 
-TIdentificator::~TIdentificator()
-{
-  // Default destructor for TIdentificator.
+TIdentificator::~TIdentificator() {
+  
+  // Default destructor for TIdentificator
+  
   fCT = 0;
 }
 
-Double_t TIdentificator::Momentum(Int_t k, Bool_t kind)
-{
+Double_t TIdentificator::Momentum(Int_t k, Bool_t kind) {
+  
   // Return the full momentum for the particle in the row k of the EVNT
   // bank.
   //
@@ -147,8 +148,8 @@ Double_t TIdentificator::Momentum(Int_t k, Bool_t kind)
   }
 }
 
-Double_t TIdentificator::Mass2(Int_t k, Bool_t kind)
-{
+Double_t TIdentificator::Mass2(Int_t k, Bool_t kind) {
+  
   // Return the mass squared for the particle in the row k of the EVNT bank.
   // (From the SC TOF!) borquez_mod 
   
@@ -160,6 +161,7 @@ Double_t TIdentificator::Mass2(Int_t k, Bool_t kind)
 }
 
 Double_t TIdentificator::ThetaLab(Int_t k, Bool_t kind) {
+
   // Return the polar angle in Lab frame for the particle in the row k of
   // the EVNT bank.
   //
@@ -180,6 +182,7 @@ Double_t TIdentificator::ThetaLab(Int_t k, Bool_t kind) {
 }
 
 Double_t TIdentificator::PhiLab(Int_t k, Bool_t kind) {
+
   // Return the azimuthal angle in Lab frame for the particle in the row k
   // of the EVNT bank.
   //
@@ -204,178 +207,235 @@ Double_t TIdentificator::PhiLab(Int_t k, Bool_t kind) {
   return phi_val;
 }
 
-Double_t TIdentificator::ThetaVirtLab(Bool_t kind) // Check if it is correct !!!
-{
+Double_t TIdentificator::ThetaVirtLab(Int_t ke, Bool_t kind) { // Check if it is correct !!!
+
   // Return the polar angle of the virtual photon in Lab frame, for the
-  // particle in the row k of the EVNT bank.
+  // particle in the row k of the EVNT bank
+  //
+  // The virtual photon information depends on the electron info!!
   //
   // If kind is zero, the EVNT bank is used. If not, the GSIM bank is used
-  // instead.
+  // instead
   
   Double_t theta_virt;
   
-  if(kind==0) 
-    theta_virt=acos((kEbeam-Momentum(0)*cos(ThetaLab(0)*TMath::Pi()/180.))/(sqrt(Q2()+Nu()*Nu())));
-  else
-    theta_virt=acos((kEbeam-Momentum(0,1)*cos(ThetaLab(0,1)*TMath::Pi()/180.))/(sqrt(Q2(1)+Nu(1)*Nu(1))));
+  if (kind == 0) { 
+    theta_virt = acos((kEbeam - Momentum(ke)*cos(ThetaLab(ke)*TMath::Pi()/180.))/(TMath::Sqrt(Q2(ke)+Nu(ke)*Nu(ke))));
+  } else {
+    theta_virt = acos((kEbeam - Momentum(ke,1)*cos(ThetaLab(ke,1)*TMath::Pi()/180.))/(TMath::Sqrt(Q2(ke,1)+Nu(ke,1)*Nu(ke,1))));
+  }
+  
   return theta_virt;
 }
 
-Double_t TIdentificator::PhiVirtLab(Bool_t kind) // Check if it is correct !!!
-{
+Double_t TIdentificator::PhiVirtLab(Int_t ke, Bool_t kind) { // Check if it is correct !!!
+
   // Return the azimuthal angle of the virtual photon in Lab frame, for the
-  // particle in the row k of the EVNT bank.
+  // particle in the row k of the EVNT bank
+  //
+  // The virtual photon information depends on the electron info!!
   //
   // If kind is zero, the EVNT bank is used. If not, the GSIM bank is used
-  // instead.
-  if(PhiLab(0,kind) > 0) 
-    return (-180.+PhiLab(0,kind));
-  else 
-    return (180.+PhiLab(0,kind));
+  // instead
+  
+  if (PhiLab(ke,kind) > 0) {
+    return PhiLab(ke,kind) - 180.;
+  } else { 
+    return PhiLab(ke,kind) + 180.;
+  }
 }
 
-Double_t TIdentificator::ThetaPQ(Int_t k, Bool_t kind) {
+Double_t TIdentificator::ThetaPQ(Int_t k, Int_t ke, Bool_t kind) {
+  
   // Return the polar angle of the born particle in respect to virtual
   // photon direction, for the particle in the row k of the EVNT bank. It
-  // doesn't apply for electron.
+  // doesn't apply for electron
+  //
+  // The virtual photon direction is obtained from the electron direction,
+  // the chosen electron is in row "ke"
   //
   // If kind is zero, the EVNT bank is used. If not, the GSIM bank is used
-  // instead.
+  // instead
   
   Double_t theta_pq;
   if (kind == 0) {
     TVector3 Vpi(Px(k),Py(k),Pz(k));
-    TVector3 Vvirt(-Px(0),-Py(0),kEbeam-Pz(0));
-    theta_pq=Vvirt.Angle(Vpi)*180./(TMath::Pi());
+    TVector3 Vvirt(-Px(ke),-Py(ke),kEbeam - Pz(ke));
+    theta_pq = Vvirt.Angle(Vpi)*180./(TMath::Pi());
   } else {
     TVector3 Vpi(Px(k,1),Py(k,1),Pz(k,1));
-    TVector3 Vvirt(-Px(0,1),-Py(0,1),kEbeam-Pz(0,1));
-    theta_pq=Vvirt.Angle(Vpi)*180./(TMath::Pi());
+    TVector3 Vvirt(-Px(ke,1),-Py(ke,1),kEbeam - Pz(ke,1));
+    theta_pq = Vvirt.Angle(Vpi)*180./(TMath::Pi());
   }
   return theta_pq;
 }
 
-Double_t TIdentificator::PhiPQ(Int_t k, Bool_t kind) {
+Double_t TIdentificator::PhiPQ(Int_t k, Int_t ke, Bool_t kind) {
+  
   // Return the azimuthal angle of the born particle in respect to virtual
   // photon direction, for the particle in the row k of the EVNT bank. It
   // doesn't apply for electron.
+  //
+  // The virtual photon direction is obtained from the electron direction,
+  // the chosen electron is in row "ke"
   //
   // If kind is zero, the EVNT bank is used. If not, the GSIM bank is used
   // instead.
   
   Double_t phi_pq;
   if (kind == 0) {
-    TVector3 Vpi(Px(k),Py(k),Pz(k));
-    TVector3 Vvirt(-Px(0),-Py(0),kEbeam-Pz(0));
-    Double_t phi_z = TMath::Pi()-Vvirt.Phi();
+    TVector3 Vpi(Px(k), Py(k), Pz(k));
+    TVector3 Vvirt(-Px(ke), -Py(ke), kEbeam - Pz(ke));
+    Double_t phi_z = TMath::Pi() - Vvirt.Phi();
     Vvirt.RotateZ(phi_z);
     Vpi.RotateZ(phi_z);
     TVector3 Vhelp(0.,0.,1.);
     Double_t phi_y = Vvirt.Angle(Vhelp);
     Vvirt.RotateY(phi_y);
     Vpi.RotateY(phi_y);
-    phi_pq=Vpi.Phi() * 180./(TMath::Pi());
+    phi_pq = Vpi.Phi()*180./TMath::Pi();
   } else {
-    TVector3 Vpi(Px(k,1),Py(k,1),Pz(k,1));
-    TVector3 Vvirt(-Px(0,1),-Py(0,1),kEbeam-Pz(0,1));
-    Double_t phi_z = TMath::Pi()-Vvirt.Phi();
+    TVector3 Vpi(Px(k,1), Py(k,1), Pz(k,1));
+    TVector3 Vvirt(-Px(ke,1), -Py(ke,1), kEbeam - Pz(ke,1));
+    Double_t phi_z = TMath::Pi() - Vvirt.Phi();
     Vvirt.RotateZ(phi_z);
     Vpi.RotateZ(phi_z);
     TVector3 Vhelp(0.,0.,1.);
-    Double_t phi_y=Vvirt.Angle(Vhelp);
+    Double_t phi_y = Vvirt.Angle(Vhelp);
     Vvirt.RotateY(phi_y);
     Vpi.RotateY(phi_y);
-    phi_pq = Vpi.Phi() * 180./(TMath::Pi());
+    phi_pq = Vpi.Phi()*180./TMath::Pi();
   }
   
   return phi_pq;
 }
 
-Double_t TIdentificator::CosThetaPQ(Int_t k, Bool_t kind) {
-  // Return the cosine of ThetaPQ, for the particle in the row k of the EVNT
-  // bank. It doesn't apply for electron.
+Double_t TIdentificator::CosThetaPQ(Int_t k, Int_t ke, Bool_t kind) {
+  
+  // Returns the cosine of ThetaPQ, for the particle in the row k of the EVNT
+  // bank
+  //
+  // The virtual photon direction is obtained from the electron direction,
+  // the chosen electron is in row "ke"
   //
   // If kind is zero, the EVNT bank is used. If not, the GSIM bank is used
-  // instead.
+  // instead
+
+  Double_t cos_theta_pq;
   
-  if (kind == 0)
-    return (Pz(k) * (kEbeam - Pz(0)) - Px(k) * Px(0) - Py(k) * Py(0)) /
-      (sqrt(Nu() * Nu() + Q2()) * Momentum(k));
-  else                                // Fix this in case kind != 1
-    return (Pz(k,1) * (kEbeam - Pz(0,1)) - Px(k,1) * Px(0,1) -
-	    Py(k,1) * Py(0,1)) /
-      (sqrt(Nu(1) * Nu(1) + Q2(1)) * Momentum(k,1));
+  if (kind == 0) {
+    cos_theta_pq = (Pz(k) * (kEbeam - Pz(ke)) - Px(k) * Px(ke) - Py(k) * Py(ke)) / (TMath::Sqrt(Nu(ke) * Nu(ke) + Q2(ke)) * Momentum(k));
+  } else {
+    cos_theta_pq = (Pz(k,1) * (kEbeam - Pz(ke,1)) - Px(k,1) * Px(ke,1) - Py(k,1) * Py(ke,1)) / (TMath::Sqrt(Nu(ke,1) * Nu(ke,1) + Q2(ke,1)) * Momentum(k,1));
+  }
+
+  return cos_theta_pq;
 }
 
-Double_t TIdentificator::Pt2(Int_t k, Bool_t kind) {
-  if (kind == 0)
-    return Momentum(k) * Momentum(k) *
-      (1 - CosThetaPQ(k) * CosThetaPQ(k));
-  else                                // Fix this in case k != 1
-    return Momentum(k,1) * Momentum(k,1) *
-      (1 - CosThetaPQ(k,1) * CosThetaPQ(k,1));
+Double_t TIdentificator::Pt2(Int_t k, Int_t ke, Bool_t kind) {
+
+  // Returns the square of transverse momentum component
+  // w.r.t virtual photon direction
+  //
+  // The virtual photon direction is obtained from the electron direction,
+  // the chosen electron is in row "ke"
+  //
+  // If kind is zero, the EVNT bank is used. If not, the GSIM bank is used
+  // instead  
+
+  Double_t Pt2;
+  
+  if (kind == 0) {
+    Pt2 = Momentum(k) * Momentum(k) * (1 - CosThetaPQ(k,ke) * CosThetaPQ(k,ke));
+  } else {
+    Pt2 = Momentum(k,1) * Momentum(k,1) * (1 - CosThetaPQ(k,ke,1) * CosThetaPQ(k,ke,1));
+  }
+
+  return Pt2;
 }
 
-Double_t TIdentificator::Pl2(Int_t k, Bool_t kind) {
-  if (kind == 0)
-    return Momentum(k) * Momentum(k) * CosThetaPQ(k) * CosThetaPQ(k);
-  else                                // Fix this in case k != 1
-    return Momentum(k,1) * Momentum(k,1) * CosThetaPQ(k,1) * CosThetaPQ(k,1);
-}
+Double_t TIdentificator::Pl2(Int_t k, Int_t ke, Bool_t kind) {
 
+  // Returns the square of the longitudinal momentum component
+  // w.r.t virtual photon direction
+  //
+  // The virtual photon direction is obtained from the electron direction,
+  // the chosen electron is in row "ke"
+  //
+  // If kind is zero, the EVNT bank is used. If not, the GSIM bank is used
+  // instead  
+
+  Double_t Pl2;
+  
+  if (kind == 0) {
+    Pl2 = Momentum(k) * Momentum(k) * CosThetaPQ(k,ke) * CosThetaPQ(k,ke);
+  } else {
+    Pl2 =  Momentum(k,1) * Momentum(k,1) * CosThetaPQ(k,ke,1) * CosThetaPQ(k,ke,1);
+  }
+
+  return Pl2;
+}
+/*
 Double_t TIdentificator::PlCM(Int_t k, Bool_t kind) {
+
   if (kind == 0)
     return (Nu() + kMprt) * (TMath::Sqrt(Pl2(k)) - TMath::Sqrt(Q2() + Nu() * Nu()) * Zh(k) * Nu() / (Nu() + kMprt)) / W();
   else                                // Fix this in case k != 1
     return (Nu(1) + kMprt) * (TMath::Sqrt(Pl2(k,1)) - TMath::Sqrt(Q2(1) + Nu(1) * Nu(1)) * Zh(k,1) * Nu(1) / (Nu(1) + kMprt)) / W(1);
 }
-
+*/
+/*
 Double_t TIdentificator::PmaxCM(Bool_t kind) {
+
   if (kind == 0)
     return TMath::Sqrt(TMath::Power(W() * W() - kMntr * kMntr + kMpi * kMpi, 2) - 4. * kMpi * kMpi * W() * W()) / 2. / W();
   else                                // Fix this in case k != 1
     return TMath::Sqrt(TMath::Power(W(1) * W(1) - kMntr * kMntr + kMpi * kMpi, 2) - 4. * kMpi * kMpi * W(1) * W(1)) / 2. / W(1);
 }
-
+*/
+/*
 Double_t TIdentificator::PTrans2PQ(Int_t k, Bool_t kind) {
+
   // Return the momentum transverse component squared of the born particle
   // in respect to virtual photon direction, for the particle in the row k
-  // of the EVNT bank. It doesn't apply for electron.
+  // of the EVNT bank. It doesn't apply for electron
   //
   // If kind is zero, the EVNT bank is used. If not, the GSIM bank is used
-  // instead.
+  // instead
   
   if (kind == 0)
     return Momentum(k) * Momentum(k) *
       (1 - CosThetaPQ(k) * CosThetaPQ(k));
-  else                                // Fix this in case kind != 1
+  else
     return Momentum(k,1) * Momentum(k,1) *
       (1 - CosThetaPQ(k,1) * CosThetaPQ(k,1));
 }
-
+*/
+/*
 Double_t TIdentificator::PLong2PQ(Int_t k, Bool_t kind) {
+  
   // Return the momentum longitudinal component squared of the born particle
   // in respect to virtual photon direction, for the particle in the row k
-  // of the EVNT bank. It doesn't apply for electron.
+  // of the EVNT bank. It doesn't apply for electron
   //
   // If kind is zero, the EVNT bank is used. If not, the GSIM bank is used
-  // instead.
+  // instead
   
   if (kind == 0)
     return Momentum(k) * Momentum(k) * CosThetaPQ(k) * CosThetaPQ(k);
-  else                                // Fix this in case kind != 1
+  else
     return Momentum(k,1) * Momentum(k,1) * CosThetaPQ(k,1) * CosThetaPQ(k,1);
 }
+*/
+Int_t TIdentificator::Sector(Int_t k, Bool_t kind) { // Check if it is correct !!! Add k==1
 
-Int_t TIdentificator::Sector(Int_t k, Bool_t kind) // Check if it is correct !!! Add k==1
-{
   // Return the sector of the CLAS detector where the particle was detected,
-  // for the particle in the row k of the EVNT bank.
+  // for the particle in the row k of the EVNT bank
   //
   // If kind is zero, the EVNT bank is used. If not, the GSIM bank is used
-  // instead.
+  // instead
   
-  if ( kind == 0) {
+  if (kind == 0) {
     if (PhiLab(k) != 330.)
       return int((PhiLab(k) + 90.) / 60.) - 1;
     else return 5;
@@ -386,236 +446,215 @@ Int_t TIdentificator::Sector(Int_t k, Bool_t kind) // Check if it is correct !!!
   }
 }
 
-Double_t TIdentificator::Q2(Int_t ek, Bool_t kind) {
+Double_t TIdentificator::Q2(Int_t ke, Bool_t kind) {
   
-  // Return the four-momentum transfer of the electron-nucleon interaction.
-  // For the electron in the row ek of the EVNT bank.
+  // Return the four-momentum transfer of the electron-nucleon interaction
+  // For the electron in the row "ke" of the EVNT bank
   //
   // If kind is zero, the EVNT bank is used. If not, the GSIM bank is used
-  // instead.
+  // instead
+
+  Double_t Q2;
   
   if (kind == 0) {
-    return 4. * kEbeam * Momentum(ek) *
-      sin(ThetaLab(k)*TMath::Pi()/180./2) * sin(ThetaLab(ek)*TMath::Pi()/180./2);
-  } else {                            // Fix this in case k != 1
-    return 4. * kEbeam * Momentum(ek,1) *
-      sin(ThetaLab(k,1)*TMath::Pi()/180./2) * sin(ThetaLab(ek,1)*TMath::Pi()/180./2);
+    Q2 = 4. * kEbeam * Momentum(ke) * sin(ThetaLab(ke)*TMath::Pi()/180./2) * sin(ThetaLab(ke)*TMath::Pi()/180./2);
+  } else {
+    Q2 = 4. * kEbeam * Momentum(ke,1) * sin(ThetaLab(ke,1)*TMath::Pi()/180./2) * sin(ThetaLab(ke,1)*TMath::Pi()/180./2);
   }
+
+  return Q2;
 }
 
-Double_t TIdentificator::W(Int_t ek, Bool_t kind) {
+Double_t TIdentificator::W(Int_t ke, Bool_t kind) {
   
   // Return the invariant mass of the electron-nucleon interaction.
-  //
+  // From the electron in the row "ke" of the EVNT bank
+  // 
   // If kind is zero, the EVNT bank is used. If not, the GSIM bank is used
-  // instead.
+  // instead
   
   if (kind == 0) {
-    return TMath::Sqrt(kMprt * kMprt + 2. * kMprt * Nu(ek) - Q2(ek));
-  } else {                            // Fix this in case k != 1
-    return TMath::Sqrt(kMprt * kMprt + 2. * kMprt * Nu(ek,1) - Q2(ek,1));
+    return TMath::Sqrt(kMprt * kMprt + 2. * kMprt * Nu(ke) - Q2(ke));
+  } else {
+    return TMath::Sqrt(kMprt * kMprt + 2. * kMprt * Nu(ke,1) - Q2(ke,1));
   }
 }
 
-Double_t TIdentificator::Nu(Int_t ek, Bool_t kind) {
+Double_t TIdentificator::Nu(Int_t ke, Bool_t kind) {
   
-  // Return the energy transfer of the electron-nucleon interaction.
+  // Return the energy transfer of the electron-nucleon interaction
+  // From the electron in the row "ke" of the EVNT bank
   //
   // If kind is zero, the EVNT bank is used. If not, the GSIM bank is used
-  // instead.
+  // instead
   
   if (kind == 0) {
-    return kEbeam - Momentum(ek);
-  } else {                            // Fix this in case k != 1
-    return kEbeam - Momentum(ek,1);
+    return kEbeam - Momentum(ke);
+  } else {
+    return kEbeam - Momentum(ke,1);
   }
 }
 
-Double_t TIdentificator::Xb(Int_t k, Bool_t kind) {
+Double_t TIdentificator::Xb(Int_t ke, Bool_t kind) {
   
   // Return the energy transfer of the electron-nucleon interaction.
+  // From the electron in the row "ke" of the EVNT bank
   //
   // If kind is zero, the EVNT bank is used. If not, the GSIM bank is used
-  // instead.
+  // instead
   
   if (kind == 0) {
-    return Q2(ek) / 2. / Nu(ek) / kMprt;
-  } else {                            // Fix this in case k != 1
-    return Q2(ek,1) / 2. / Nu(ek,1) / kMprt;
+    return Q2(ke) / 2. / Nu(ke) / kMprt;
+  } else {
+    return Q2(ke,1) / 2. / Nu(ke,1) / kMprt;
   }
 }
 
-Double_t TIdentificator::Yb(Int_t ek, Bool_t kind) {
+Double_t TIdentificator::Yb(Int_t ke, Bool_t kind) {
 
   // Return the energy transfer of the electron-nucleon interaction.
+  // From the electron in the row "ke" of the EVNT bank
   //
   // If kind is zero, the EVNT bank is used. If not, the GSIM bank is used
-  // instead.
+  // instead
   
   if (kind == 0) {
-    return Nu(ek) / kEbeam;
-  } else {                            // Fix this in case k != 1
-    return Nu(ek, 1) / kEbeam;
+    return Nu(ke) / kEbeam;
+  } else {
+    return Nu(ke,1) / kEbeam;
   }        
 }
 
-Double_t TIdentificator::Zh(Int_t k, Bool_t kind, Double_t Mass) {
-  if (kind == 0)
-    return TMath::Sqrt(Mass * Mass + Momentum(k) * Momentum(k)) / Nu();
-  else                                // Fix this in case k != 1
-    return TMath::Sqrt(Mass * Mass + Momentum(k,1) * Momentum(k,1)) / Nu(1);
-}
+Double_t TIdentificator::Zh(Int_t k, Int_t ke, Bool_t kind, Double_t Mass) {
 
-Double_t TIdentificator::Xf(Int_t k, Bool_t kind)
-{
+  // Return the energy fraction of the born particle, for the particle in
+  // the row k of the EVNT bank. It doesn't apply for electron
+  //
+  // From the electron in the row "ke" of the EVNT bank
+  //
+  // If kind is zero, the EVNT bank is used. If not, the GSIM bank is used
+  // instead
+
+  if (kind == 0) {
+    return TMath::Sqrt(Mass * Mass + Momentum(k) * Momentum(k)) / Nu(ke);
+  } else{
+    return TMath::Sqrt(Mass * Mass + Momentum(k,1) * Momentum(k,1)) / Nu(ke,1);
+  }
+}
+/*
+Double_t TIdentificator::Xf(Int_t k, Bool_t kind) {
+
+  // Deprecated...
+  
   if (kind == 0)
     return PlCM(k) / PmaxCM();
   else                                // Fix this in case k != 1
     return PlCM(k,1) / PmaxCM(1);
 }
+*/
+Double_t TIdentificator::Mx2(Int_t k, Int_t ke, Bool_t kind, Double_t Mass) {
 
-Double_t TIdentificator::Mx2(Int_t k, Bool_t kind)
-{
-  if (kind == 0)
-    return W() * W() - 2. * Nu() * Zh(k) * (Nu() + kMprt) + kMpi * kMpi + 2. * TMath::Sqrt((Q2() + Nu() * Nu()) * Pl2(k));
-  else                                // Fix this in case k != 1
-    return W(1) * W(1) - 2. * Nu(1) * Zh(k,1) * (Nu(1) + kMprt) + kMpi * kMpi + 2. * TMath::Sqrt((Q2(1) + Nu(1) * Nu(1)) * Pl2(k,1));
-}
-
-Double_t TIdentificator::T(Int_t k, Bool_t kind) {
-  if (kind == 0)
-    return 2. * TMath::Sqrt((Nu() * Nu() + Q2()) * Pl2(k)) + kMpi * kMpi - Q2() - 2. * Nu() * Nu() * Zh(k);
-  else                                // Fix this in case k != 1
-    return 2. * TMath::Sqrt((Nu(1) * Nu(1) + Q2(1)) * Pl2(k,1)) + kMpi * kMpi - Q2(1) - 2. * Nu(1) * Nu(1) * Zh(k,1);
-}
-
-Double_t TIdentificator::ZhPi(Int_t k, Double_t Mass, Bool_t kind) // name needs to be switched
-{
-  // Return the energy fraction of the born particle, for the particle in
-  // the row k of the EVNT bank. It doesn't apply for electron.
-  //
-  // If kind is zero, the EVNT bank is used. If not, the GSIM bank is used
-  // instead.
+  // definition?
   
   if (kind == 0)
-    return sqrt(Mass * Mass + Momentum(k) * Momentum(k)) / Nu(0);
-  else                                // Fix this in case kind != 1
-    return sqrt(Mass * Mass + Momentum(k,1) * Momentum(k,1)) / Nu(1);
+    return W(ke) * W(ke) - 2. * Nu(ke) * Zh(k,ke,0,Mass) * (Nu(ke) + kMprt) + Mass * Mass + 2. * TMath::Sqrt((Q2(ke) + Nu(ke) * Nu(ke)) * Pl2(k,ke));
+  else                                // Fix this in case k != 1
+    return W(ke,1) * W(ke,1) - 2. * Nu(ke,1) * Zh(k,ke,1,Mass) * (Nu(ke,1) + kMprt) + Mass * Mass + 2. * TMath::Sqrt((Q2(ke,1) + Nu(ke,1) * Nu(ke,1)) * Pl2(k,ke,1));
 }
 
-Double_t TIdentificator::TimeCorr4(Double_t mass, Int_t k) {
+Double_t TIdentificator::T(Int_t k, Int_t ke, Bool_t kind, Double_t Mass) {
+
+  // definition?
+  
+  if (kind == 0) {
+    return 2. * TMath::Sqrt((Nu(ke) * Nu(ke) + Q2(ke)) * Pl2(k,ke)) + Mass * Mass - Q2(ke) - 2. * Nu(ke) * Nu(ke) * Zh(k,ke,0,Mass);
+  } else {
+    return 2. * TMath::Sqrt((Nu(ke,1) * Nu(ke,1) + Q2(ke,1)) * Pl2(k,ke,1)) + Mass * Mass - Q2(ke,1) - 2. * Nu(ke,1) * Nu(ke,1) * Zh(k,ke,1,Mass);
+  }
+}
+
+Double_t TIdentificator::TimeCorr4(Int_t k, Int_t ke, Double_t mass) {
 
   // Time correction
+  // compares timing of particle in row "k" with electron in row "ke"
   
-  return (PathSC(0)/30.) - TimeSC(0) + TimeSC(k) - 0.08 - (PathSC(k) / 30.) * TMath::Sqrt(pow(mass/Momentum(k),2) + 1);
+  return (PathSC(ke)/30.) - TimeSC(ke) + TimeSC(k) - 0.08 - (PathSC(k) / 30.)*TMath::Sqrt(pow(mass/Momentum(k),2) + 1);
 }
 
-Double_t TIdentificator::FidTheta(Int_t k, Bool_t kind)
-{
+Double_t TIdentificator::FidTheta(Int_t k, Bool_t kind) {
+
+  // returns (fiducial?) theta angle for the particle in row "k"
+
   Double_t fid_theta_val;
   
-  if (kind == 0)
-    {
-      TVector3 v3p(Px(k), Py(k), Pz(k));
-      fid_theta_val = v3p.Theta() * 180 / TMath::Pi();
-    } else {
+  if (kind == 0) {
+    TVector3 v3p(Px(k), Py(k), Pz(k));
+    fid_theta_val = v3p.Theta()*180/TMath::Pi();
+  } else {
     TVector3 v3p(Px(k,1), Py(k,1), Pz(k,1));
-    fid_theta_val = v3p.Theta() * 180 / TMath::Pi();
+    fid_theta_val = v3p.Theta()*180/TMath::Pi();
   }
   
   return fid_theta_val;
 }
 
-Double_t TIdentificator::FidThetaMin()
-{
-  Int_t sector = Sector(0);
-  
-  Double_t theta_min_val = kThetaPar0[sector] +
-    kThetaPar1[sector] / pow(Momentum(0),2) +
-    kThetaPar2[sector] * Momentum(0) +
-    kThetaPar3[sector] / Momentum(0) +
-    kThetaPar4[sector] *exp(kThetaPar5[sector] * Momentum(0));
-  
-  return theta_min_val;
-}
+Double_t TIdentificator::FidThetaMin(Int_t k) {
 
-Double_t TIdentificator::FidThetaMinPiPlus(Int_t k)
-{
+  // now it works for every particle!
+  
   Int_t sector = Sector(k);
   
-  Double_t theta_min_val = kThetaPar0PiPlus[sector] +
-    kThetaPar1PiPlus[sector] / pow(Momentum(k), 2) +
-    kThetaPar2PiPlus[sector] * Momentum(k) +
-    kThetaPar3PiPlus[sector] / Momentum(k) +
-    kThetaPar4PiPlus[sector] * exp(kThetaPar5PiPlus[sector] * Momentum(k));
+  Double_t theta_min_val = kThetaPar0[sector] +
+    kThetaPar1[sector] / pow(Momentum(k),2) +
+    kThetaPar2[sector] * Momentum(k) +
+    kThetaPar3[sector] / Momentum(k) +
+    kThetaPar4[sector] * exp(kThetaPar5[sector] * Momentum(k));
   
   return theta_min_val;
 }
 
-Double_t TIdentificator::FidFunc(Int_t side, Int_t param)
-{
-  Int_t sector = Sector(0);
+Double_t TIdentificator::FidFunc(Int_t k, Int_t side, Int_t param) {
+
+  // now it works for every particle!
+  
+  Int_t sector = Sector(k);
+  
   Double_t fid_func_val = 0.0; // dummy value to avoid that uninitialized warning
   
   if (side == 0 && param==0)
     fid_func_val = kFidPar0Low0[sector] +
       kFidPar0Low1[sector] * exp(kFidPar0Low2[sector] *
-				 (Momentum(0) - kFidPar0Low3[sector]));
+				 (Momentum(k) - kFidPar0Low3[sector]));
   else if (side == 1 && param==0)
     fid_func_val = kFidPar0High0[sector] +
       kFidPar0High1[sector] * exp(kFidPar0High2[sector] *
-				  (Momentum(0) - kFidPar0High3[sector]));
+				  (Momentum(k) - kFidPar0High3[sector]));
   else if (side == 0 && param==1)
     fid_func_val=kFidPar1Low0[sector] +
-      kFidPar1Low1[sector] * Momentum(0) *
-      exp(kFidPar1Low2[sector] * pow((Momentum(0) -
+      kFidPar1Low1[sector] * Momentum(k) *
+      exp(kFidPar1Low2[sector] * pow((Momentum(k) -
 				      kFidPar1Low3[sector]),2));
   else if (side == 1 && param==1)
     fid_func_val = kFidPar1High0[sector] +
-      kFidPar1High1[sector] * Momentum(0) *
-      exp(kFidPar1High2[sector] * pow((Momentum(0) -
+      kFidPar1High1[sector] * Momentum(k) *
+      exp(kFidPar1High2[sector] * pow((Momentum(k) -
 				       kFidPar1High3[sector]),2));
   
   return fid_func_val;
 }
 
-Double_t TIdentificator::FidFuncPiPlus(Int_t side, Int_t param, Int_t k)
-{
-  Int_t sector = Sector(k);
-  Double_t fid_func_val_pip = 0.0; // dummy value to avoid that uninitialized warning
-  
-  if (side == 0 && param == 0)
-    fid_func_val_pip = kFidPar0Low0PiPlus[sector] +
-      kFidPar0Low1PiPlus[sector] * exp(kFidPar0Low2PiPlus[sector] *
-				       (Momentum(k) - kFidPar0Low3PiPlus[sector]));
-  else if (side == 1 && param == 0)
-    fid_func_val_pip = kFidPar0High0PiPlus[sector] +
-      kFidPar0High1PiPlus[sector] * exp(kFidPar0High2PiPlus[sector] *
-					(Momentum(k) - kFidPar0High3PiPlus[sector]));
-  else if (side == 0 && param == 1)
-    fid_func_val_pip = kFidPar1Low0PiPlus[sector] +
-      kFidPar1Low1PiPlus[sector] * Momentum(k) *
-      exp(kFidPar1Low2PiPlus[sector] * pow((Momentum(k) -
-					    kFidPar1Low3PiPlus[sector]), 2));
-  else if (side == 1 && param == 1)
-    fid_func_val_pip = kFidPar1High0PiPlus[sector] +
-      kFidPar1High1PiPlus[sector] * Momentum(k) *
-      exp(kFidPar1High2PiPlus[sector] * pow((Momentum(k) -
-					     kFidPar1High3PiPlus[sector]), 2));
-  
-  return fid_func_val_pip;
-}
+Double_t TIdentificator::FidPhi(Int_t k, Bool_t kind) {
 
-Double_t TIdentificator::FidPhi(Int_t k, Bool_t kind)
-{
+  // returns (fiducial?) phi angle for the particle in row "k"
+  
   Double_t fid_phi_val;
   
   if (kind == 0) {
     TVector3 v3p(Px(k), Py(k), Pz(k));
-    fid_phi_val = v3p.Phi() * 180 / TMath::Pi();
+    fid_phi_val = v3p.Phi()*180/TMath::Pi();
   } else {
     TVector3 v3p(Px(k,1), Py(k,1), Pz(k,1));
-    fid_phi_val = v3p.Phi() * 180 / TMath::Pi();
+    fid_phi_val = v3p.Phi()*180/TMath::Pi();
   }
   
   if (fid_phi_val < -30)
@@ -626,97 +665,50 @@ Double_t TIdentificator::FidPhi(Int_t k, Bool_t kind)
   return fid_phi_val;
 }
 
-Double_t TIdentificator::FidPhiMin()
-{
-  Int_t sector = Sector(0);
+Double_t TIdentificator::FidPhiMin(Int_t k) {
+  
+  Int_t sector = Sector(k);
   Double_t fid_phi_min_val;
   
-  if (FidTheta(0) <= FidThetaMin()) {
+  if (FidTheta(k) <= FidThetaMin(k)) {
     fid_phi_min_val = 60. * sector;
     return fid_phi_min_val;
   } else {
-    fid_phi_min_val = 60. * sector - FidFunc(0,0) *
-      (1 - 1 / (1 + (FidTheta(0) - FidThetaMin()) / FidFunc(0,1)));
+    fid_phi_min_val = 60. * sector - FidFunc(k,0,0) *
+      (1 - 1 / (1 + (FidTheta(k) - FidThetaMin(k)) / FidFunc(k,0,1)));
     return fid_phi_min_val;
   }
 }
 
-Double_t TIdentificator::FidPhiMax()
-{
-  Int_t sector = Sector(0);
-  Double_t fid_phi_max_val;
+Double_t TIdentificator::FidPhiMax(Int_t k) {
   
-  if (FidTheta(0) <= FidThetaMin()){
-    fid_phi_max_val = 60. * sector;
-    return fid_phi_max_val;
-  } else {
-    fid_phi_max_val = 60. * sector + FidFunc(1,0) *
-      (1 - 1 / (1 + (FidTheta(0) - FidThetaMin()) / FidFunc(1,1)));
-    return fid_phi_max_val;
-  }
-}
-
-Double_t TIdentificator::FidPhiMinPiPlus(Int_t k)
-{
-  Int_t sector = Sector(k);
-  
-  Double_t fid_phi_min_val;
-  
-  //    if (FidTheta(k) <= FidThetaMinPiPlus(k) || FidTheta(k) >= kFidThetaMax)
-  if (FidTheta(k) <= FidThetaMinPiPlus(k)) {
-    fid_phi_min_val = 60. * sector;
-  } else {
-    fid_phi_min_val = 60. * sector - FidFuncPiPlus(0,0,k) *
-      (1 - 1 / (1 + (FidTheta(k) - FidThetaMinPiPlus(k)) / FidFuncPiPlus(0,1,k)));
-  }
-  
-  return fid_phi_min_val;
-}
-
-Double_t TIdentificator::FidPhiMaxPiPlus(Int_t k)
-{
   Int_t sector = Sector(k);
   Double_t fid_phi_max_val;
   
-  //    if (FidTheta(CT, k) <= FidThetaMinPiPlus(k) || FidTheta(k) >= kFidThetaMax)
-  if (FidTheta(k) <= FidThetaMinPiPlus(k)) {
+  if (FidTheta(k) <= FidThetaMin(k)){
     fid_phi_max_val = 60. * sector;
+    return fid_phi_max_val;
   } else {
-    fid_phi_max_val = 60. * sector + FidFuncPiPlus(1,0,k) *
-      (1 - 1 / (1 + (FidTheta(k) - FidThetaMinPiPlus(k)) / FidFuncPiPlus(1,1,k)));
+    fid_phi_max_val = 60. * sector + FidFunc(k,1,0) *
+      (1 - 1 / (1 + (FidTheta(k) - FidThetaMin(k)) / FidFunc(k,1,1)));
+    return fid_phi_max_val;
   }
-  
-  return fid_phi_max_val;
 }
 
-Bool_t TIdentificator::FidCheckCut() {
+Bool_t TIdentificator::FidCheckCut(Int_t ke) {
   
   // Checks extensive DC fiducial cut for electrons
   
-  if (FidTheta(0) > FidThetaMin() && FidPhi(0) > FidPhiMin() && FidPhi(0) < FidPhiMax())
+  if (FidTheta(ke) > FidThetaMin(ke) && FidPhi(ke) > FidPhiMin(ke) && FidPhi(ke) < FidPhiMax(ke))
     return 1;
   else
     return 0;
 }
+/*
+Int_t TIdentificator::FidSector(Int_t k, Bool_t kind) {
 
-Bool_t TIdentificator::FidCheckCutPiPlus(Int_t k)
-{
-  //    if (FidTheta(CT, k) > FidThetaMinPiPlus(CT, k) &&
-  //            FidTheta(k) < fid_theta_max &&
-  //            FidPhi(k) > FidPhiMinPiPlus(CT, k) &&
-  //            FidPhi(k) < FidPhiMaxPiPlus(CT, k))
-  //        return 1;
+  // deprecated apparently
   
-  if (FidTheta(k) > FidThetaMinPiPlus(k) &&
-      FidPhi(k) > FidPhiMinPiPlus(k) &&
-      FidPhi(k) < FidPhiMaxPiPlus(k))
-    return 1;                               // Fiducial Cut passed
-  else
-    return 0;                               // Fiducial Cut not passed
-}
-
-Int_t TIdentificator::FidSector(Int_t k, Bool_t kind)
-{
   Int_t sector;
   
   if (kind == 0) {
@@ -726,8 +718,7 @@ Int_t TIdentificator::FidSector(Int_t k, Bool_t kind)
     } else {
       return 5;
     }
-  }
-  else {
+  } else {
     if (FidPhi(k,1) != 330) {
       sector = int((FidPhi(k,1) + 90) / 60) - 1;
       return sector;
@@ -736,15 +727,16 @@ Int_t TIdentificator::FidSector(Int_t k, Bool_t kind)
     }
   }
 }
+*/
+Int_t TIdentificator::ElecVertTarg(Int_t ke, Bool_t kind = 0) {
 
-Int_t TIdentificator::ElecVertTarg() {
+  // it need the electron row "ke"
+  // assigns targtype variable!
 
-  // Equivalent to ElecVerTarg(0), just below
-  
-  Int_t p_vertex_cut_elec = 0;
+  // define default value
+  Int_t vertex_cut_elec = 0;
+
   Double_t ele_liq_lim[6][2];
-  Double_t ele_sol_low[6];
-  
   ele_liq_lim[0][0] = -32.5;
   ele_liq_lim[0][1] = -28;
   ele_liq_lim[1][0] = -32.5;
@@ -757,76 +749,42 @@ Int_t TIdentificator::ElecVertTarg() {
   ele_liq_lim[4][1] = -28.35;
   ele_liq_lim[5][0] = -33.5;
   ele_liq_lim[5][1] = -28.75;
+
+  Double_t ele_sol_low[6];
+  ele_sol_low[0] = -26.5;
+  ele_sol_low[1] = -26.;
+  ele_sol_low[2] = -25.65;
+  ele_sol_low[3] = -25.85;
+  ele_sol_low[4] = -26.65;
+  ele_sol_low[5] = -27.15;
   
   Double_t ele_sol_high = -20;
-  
-  ele_sol_low[0] = -26.5;
-  ele_sol_low[1] = -26.;
-  ele_sol_low[2] = -25.65;
-  ele_sol_low[3] = -25.85;
-  ele_sol_low[4] = -26.65;
-  ele_sol_low[5] = -27.15;
-  
-  Int_t n_sector = Sector(0);
-  
-  if (Z(0) >= ele_liq_lim[n_sector][0] && Z(0) <= ele_liq_lim[n_sector][1])
-    p_vertex_cut_elec = 1;
-  if (Z(0) >= ele_sol_low[n_sector] && Z(0) <= ele_sol_high)
-    p_vertex_cut_elec = 2;
-  
-  return p_vertex_cut_elec;
-}
-
-Int_t TIdentificator::ElecVertTarg(Bool_t kind) {
-  Int_t vertex_cut_elec = 0;
-  Double_t ele_liq_lim[6][2];
-  Double_t ele_sol_low[6];
-  ele_liq_lim[0][0] = -32.5;
-  ele_liq_lim[0][1] = -28;
-  ele_liq_lim[1][0] = -32.5;
-  ele_liq_lim[1][1] = -27.5;
-  ele_liq_lim[2][0] = -32;
-  ele_liq_lim[2][1] = -27.25;
-  ele_liq_lim[3][0] = -32;
-  ele_liq_lim[3][1] = -27.75;
-  ele_liq_lim[4][0] = -32.5;
-  ele_liq_lim[4][1] = -28.35;
-  ele_liq_lim[5][0] = -33.5;
-  ele_liq_lim[5][1] = -28.75;
-  
-  Double_t ele_sol_high=-20;
-  
-  ele_sol_low[0] = -26.5;
-  ele_sol_low[1] = -26.;
-  ele_sol_low[2] = -25.65;
-  ele_sol_low[3] = -25.85;
-  ele_sol_low[4] = -26.65;
-  ele_sol_low[5] = -27.15;
-  
+    
   if (kind == 0) {
-    Int_t n_sector = Sector(0);
-    if(Z(0)>=ele_liq_lim[n_sector][0] && Z(0)<=ele_liq_lim[n_sector][1]) 
-      vertex_cut_elec=1;
-    if(Z(0)>=ele_sol_low[n_sector] && Z(0)<=ele_sol_high) 
-      vertex_cut_elec=2;
-    
-    return vertex_cut_elec;
+    Int_t n_sector = Sector(ke);
+    if(Z(ke) >= ele_liq_lim[n_sector][0] && Z(ke) <= ele_liq_lim[n_sector][1]) 
+      vertex_cut_elec = 1;
+    if(Z(ke) >= ele_sol_low[n_sector] && Z(ke) <= ele_sol_high) 
+      vertex_cut_elec = 2;
   } else {
-    Int_t n_sector = Sector(0,1);
-    if(Z(0,1)>=ele_liq_lim[n_sector][0] && Z(0,1)<=ele_liq_lim[n_sector][1]) 
-      vertex_cut_elec=1;
-    if(Z(0,1)>=ele_sol_low[n_sector] && Z(0,1)<=ele_sol_high) 
-      vertex_cut_elec=2;
-    
-    return vertex_cut_elec;
+    Int_t n_sector = Sector(ke,1);
+    if(Z(ke,1) >= ele_liq_lim[n_sector][0] && Z(ke,1) <= ele_liq_lim[n_sector][1]) 
+      vertex_cut_elec = 1;
+    if(Z(ke,1) >= ele_sol_low[n_sector] && Z(ke,1) <= ele_sol_high) 
+      vertex_cut_elec = 2;
   }
-}
 
-Bool_t TIdentificator::PionVertTarg(Int_t k) {
+  return vertex_cut_elec;
+}
+/*
+Bool_t TIdentificator::PionVertTarg(Int_t k, Int_t ke) {
+
+  // deprecated...
+  
   Bool_t vertex_cut_pion = 0;
   Double_t pion_liq_low;
   Double_t pion_liq_high;
-  Int_t n_ele_sector = Sector(0);
+  Int_t n_ele_sector = Sector(ke);
   Int_t n_pion_sector = Sector(k);
   
   if (n_pion_sector == 5 || (n_ele_sector == 3 && n_pion_sector == 4) ||
@@ -845,42 +803,46 @@ Bool_t TIdentificator::PionVertTarg(Int_t k) {
   else
     pion_liq_high = -25.;
   
-  if (ElecVertTarg() == 1 && Z(k) >= pion_liq_low && Z(k) <= pion_liq_high)
+  if (ElecVertTarg(ke) == 1 && Z(k) >= pion_liq_low && Z(k) <= pion_liq_high)
     vertex_cut_pion = 1;
   
-  if (ElecVertTarg() == 2 && Z(k) >= -30 && Z(k) <= -18)
+  if (ElecVertTarg(ke) == 2 && Z(k) >= -30 && Z(k) <= -18)
     vertex_cut_pion = 1;
   
   return vertex_cut_pion;
 }
+*/
+TVector3 *TIdentificator::GetCorrectedVert(Int_t ke) {
 
-TVector3 *TIdentificator::GetCorrectedVert() {
+  // correct vertex for electrons
+  
   // electrons
-  TVector3 RotatedVertPos(X(0),Y(0),Z(0)); // vx,xy,vz from EVNT
-  TVector3 RotatedVertDir(Px(0),Py(0),Pz(0)); // px,py,pz from EVNT
+  TVector3 RotatedVertPos(X(ke), Y(ke), Z(ke)); // vx,xy,vz from EVNT
+  TVector3 RotatedVertDir(Px(ke), Py(ke), Pz(ke)); // px,py,pz from EVNT
   TVector3 TargetPos(0.043,-0.33,0);
 
   TVector3 *V_corr = new TVector3();
 
-  Float_t sect = Sector(0); 
+  Float_t sect = Sector(ke); 
 
   RotatedVertPos.RotateZ(-TMath::DegToRad()*60.*sect);
   RotatedVertDir.RotateZ(-TMath::DegToRad()*60.*sect);
   TargetPos.RotateZ(-TMath::DegToRad()*60.*sect);
 
-  Float_t ShiftLength = (TargetPos.X()-RotatedVertPos.X())/RotatedVertDir.X();
+  Float_t ShiftLength = (TargetPos.X() - RotatedVertPos.X())/RotatedVertDir.X();
 
   RotatedVertDir = ShiftLength*RotatedVertDir;
-  RotatedVertPos = RotatedVertPos+RotatedVertDir;
+  RotatedVertPos = RotatedVertPos + RotatedVertDir;
 
-  V_corr->SetX((RotatedVertPos-TargetPos).X());
-  V_corr->SetY((RotatedVertPos-TargetPos).Y());
+  V_corr->SetX((RotatedVertPos - TargetPos).X());
+  V_corr->SetY((RotatedVertPos - TargetPos).Y());
   V_corr->SetZ(RotatedVertPos.Z());
 
   return V_corr;
 }
 
 TVector3 *TIdentificator::XYZToUVW(TVector3 *xyz) {
+  
   // converts x,y,z EC hit in CLAS coordinate system into u,v,w distances of the EC hit
   
   Float_t ex=0.;
@@ -911,8 +873,8 @@ TVector3 *TIdentificator::XYZToUVW(TVector3 *xyz) {
   
   phy = TMath::ATan2(wy,ex)*57.29578;
   if (phy < 0.) {phy = phy + 360;}
-  phy = phy+30.;
-  if (phy > 360.) {phy = phy-360.;}
+  phy = phy + 30.;
+  if (phy > 360.) {phy = phy - 360.;}
 
   ec_phy = ((Int_t) (phy/60.))*1.0471975;
 
@@ -926,14 +888,14 @@ TVector3 *TIdentificator::XYZToUVW(TVector3 *xyz) {
   rot[2][1] = 0.;
   rot[2][2] = TMath::Cos(ec_the);
 
-  yi = ex*rot[0][0]+wy*rot[1][0]+zd*rot[2][0];
-  xi = ex*rot[0][1]+wy*rot[1][1]+zd*rot[2][1];
-  zi = ex*rot[0][2]+wy*rot[1][2]+zd*rot[2][2];
-  zi = zi-510.32 ;
+  yi = ex*rot[0][0] + wy*rot[1][0] + zd*rot[2][0];
+  xi = ex*rot[0][1] + wy*rot[1][1] + zd*rot[2][1];
+  zi = ex*rot[0][2] + wy*rot[1][2] + zd*rot[2][2];
+  zi = zi - 510.32;
 
-  yu = (yi-ylow)/sinrho;
-  ve = (yhi-ylow)/tgrho - xi + (yhi-yi)/tgrho;
-  wu = ((yhi-ylow)/tgrho + xi + (yhi-yi)/tgrho)/2./cosrho;
+  yu = (yi - ylow)/sinrho;
+  ve = (yhi - ylow)/tgrho - xi + (yhi - yi)/tgrho;
+  wu = ((yhi - ylow)/tgrho + xi + (yhi - yi)/tgrho)/2./cosrho;
 
   TVector3 *uvw = new TVector3(yu,ve,wu);
 
