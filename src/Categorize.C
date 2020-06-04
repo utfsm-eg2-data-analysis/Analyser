@@ -52,7 +52,7 @@ TString TIdentificator::GetCategorization(Int_t k, Int_t ke, TString tt) {
       (0 <= ECuvw->Z()) && (ECuvw->Z() < 410) && // W coordinate in [0,410[
       (-2.2 < PathEC(k)/(Betta(k)*30) - PathEC(k)/30) && // speed of light cut, orlando's thesis and taya's a-note, borquez_mod
              (PathEC(k)/(Betta(k)*30) - PathEC(k)/30 < 1.3) &&
-      (TMath::Max(Etot(k), Ein(k)+Eout(k))/0.272 > 0.3); // taya's analysis note, borquez_mod
+      (TMath::Max(Etot(k), Ein(k)+Eout(k))/0.272 > 0.1); // loose cut, so i can turn it on/off at a later stage, borquez_mod
 
     // just to shorten a little
     Float_t P = Momentum(k);
@@ -62,6 +62,9 @@ TString TIdentificator::GetCategorization(Int_t k, Int_t ke, TString tt) {
       partId = "gamma";
       return partId;
     }
+
+    /* deprecated gamma cuts:
+       none */
 
     Bool_t ID_pim =
       (Charge(k) == -1) &&
@@ -112,15 +115,14 @@ TString TIdentificator::GetCategorization(Int_t k, Int_t ke, TString tt) {
       partId = "pi+";
       return partId;
     }
-
     
     Bool_t ID_positron =
       (Charge(k) == 1) &&
       (Nphe(k) > 25) &&
       (Etot(k)/0.27/1.15 + 0.4 > Momentum(k)) &&
-						      (Etot(k)/0.27/1.15 - 0.2 < Momentum(k)) &&
+      (Etot(k)/0.27/1.15 - 0.2 < Momentum(k)) &&
       (Ein(k) + Eout(k) > 0.8 * 0.27 * Momentum(k)) &&
-						      (Ein(k) + Eout(k) < 1.2 * 0.27 * Momentum(k));
+      (Ein(k) + Eout(k) < 1.2 * 0.27 * Momentum(k));
     
     /* deprecated positron cuts:
        number_cc != 0 && number_ec != 0 && number_sc != 0 &&
