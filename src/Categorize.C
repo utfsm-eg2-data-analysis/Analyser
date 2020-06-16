@@ -21,7 +21,7 @@ TString TIdentificator::GetCategorization(Int_t k, Int_t ke, TString tt) {
       (Nphe(k) > (Sector(k)==0 || Sector(k)==1)*25 + (Sector(k)==2)*26 + (Sector(k)==3)*21 + (Sector(k)==4 || Sector(k)==5)*28) && // sector dependent cut
       (Momentum(k) > 0.64) && // borquez_mod
       (Ein(k) > 0.06) && // inner stack energy cut
-      (0.66 - 5*0.34 < TimeEC(k) - TimeSC(k)) && (TimeEC(k) - TimeSC(k) < 0.66 + 5*0.34) && // SC and EC coincidence time, borquez_mod
+      (0.7 - 5*0.35 < (TimeEC(k) - TimeSC(k))) && ((TimeEC(k) - TimeSC(k)) < 0.7 + 5*0.35) && // SC and EC coincidence time, borquez_mod
       SampFracCheck(k, tt) && // added sim cut and iterator dependence, borquez_mod
       (Etot(k) / 0.27 / 1.15 + 0.4 > Momentum(k)) &&
       (Etot(k) / 0.27 / 1.15 - 0.2 < Momentum(k)) &&
@@ -76,9 +76,8 @@ TString TIdentificator::GetCategorization(Int_t k, Int_t ke, TString tt) {
 			 (1.5 < P && P <= 2.0 && T4 > -0.60 && T4 < 0.44) ||
 			 (2.0 < P && P <= 2.5 && T4 > -1.00 && T4 < 0.45))) ||
        (2.5 < P && P <= 3.0 && T4 > -1.00 && T4 < 0.40) ||
-       (3.0 < P && T4 > -2.00 && T4 < 0.45)
-       );
-
+       (3.0 < P && T4 > -2.00 && T4 < 0.45));
+    
     /* deprecated pim cuts:
        Status(k) > 0 && Status(k) < 100 && StatDC(k) > 0 && DCStatus(k) > 0 */
     /* deprecated low energy pim cuts (P <= 2.5):
@@ -92,6 +91,9 @@ TString TIdentificator::GetCategorization(Int_t k, Int_t ke, TString tt) {
     Bool_t ID_pip =
 	      (Charge(k) == 1) &&
 	      (((P >= 2.7) && (Nphe(k) > 25)) ||
+	       ((P > 2.7 && P <= 3.3 && T4+0.08 >= -0.5 && T4+0.08 <= 0.4 && Mass2(k) < 0.4) || 
+		(P > 3.3 && P <= 3.7 && T4+0.08 >= -0.32 && T4+0.08 <= 0.32 && Mass2(k) < 0.37) || 
+		(P > 3.7 && T4+0.08 >= -0.3 && T4+0.08 <= 0.3 && Mass2(k) < 0.37)) || 
 	       ((P < 2.7) && ((P > 0 && P <= 0.25 && T4 >= -1.45 && T4 <= 1.05) ||
 			      (P > 0.25 && P <= 0.5 && T4 >= -1.44 && T4 <= 1.05) || 
 			      (P > 0.5 && P <= 0.75 && T4 >= -1.44 && T4 <= 1.05) ||
@@ -102,7 +104,7 @@ TString TIdentificator::GetCategorization(Int_t k, Int_t ke, TString tt) {
 			      (P > 1.75 && P <= 2 && T4 >= -1.25 && T4 <= 0.68) ||
 			      (P > 2 && P <= 2.25 && T4 >= -0.95 && T4 <= 0.65) ||
 			      (P > 2.25 && P <= 2.5 && T4 >= -1.05 && T4 <= 0.61 && Mass2(k) < 0.5) ||
-			      (P > 2.5 && P < 2.7 && T4 >= -1.05 && T4 <= 0.61 && Mass2(k) < 0.4))));
+			      (P > 2.5 && P <= 2.7 && T4 >= -1.05 && T4 <= 0.61 && Mass2(k) < 0.4))));
 
     /* deprecated pip cuts:
        Status(k) > 0 && Status(k) < 100 && StatDC(k) > 0 && DCStatus(k) > 0 */
