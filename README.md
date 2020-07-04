@@ -1,7 +1,8 @@
 # Analyser
 
-Analysis tool that filters "ClasTool-formatted" .root files.
-It includes the C++ class TIdentificator, which is in charge of the particle identification cuts.
+Analysis tool, developed by Hayk Hakobyan, that filters "ClasTool-formatted" .root files.
+
+It includes the C++ class **TIdentificator**, which is in charge of the particle identification cuts.
 
 ## Installation
 
@@ -31,7 +32,9 @@ And, also:
 #### Example for Bash
 
 If you're using Bash as your Unix shell, you only need to add the following lines at the end of your `.bashrc` file located in
-your home directory. **Note:** here I previously defined another environment variable called `TOPDIR`, which stands for a directory
+your home directory. 
+
+**Note:** here I previously defined another environment variable called `TOPDIR`, which stands for a directory
 where all the related repositories are located.
 ```
 export OS_NAME=`uname`
@@ -51,11 +54,11 @@ For this to make effect, remember to reload your bash session: by closing and op
 source .bashrc
 ```
 
-### Compilation
+## Compilation
 
 Compile by running Makefile.
 
-### Integration with ROOT command console
+## Integration with ROOT command console
 
 Create an empty text file called `rootlogon.C` in your home directory.
 This file contains the instructions to run at the beginning of each ROOT console session.
@@ -79,8 +82,8 @@ Rint.Logon: ~/rootlogon.C
 
 ### Debug for ROOT
 
-From ROOT v6.14 onwards, it has become necessary to copy all dictionaries files into the dynamic libraries folders `slib`.
-To fix the annoying warning message, you should run this commands:
+From ROOT v6.14 onwards, it has become necessary to copy all dictionary files into the dynamic libraries folders `slib`.
+To fix the annoying warning message, you should run these commands:
 
 * Inside ClasTool directory, run:
 ```
@@ -91,3 +94,13 @@ find . -name *.pcm -exec cp -t ./slib/Linux {} +
 ```
 find . -name *.pcm -exec cp -t ./slib {} +
 ```
+
+## Documentation
+
+More information can be found inside the directory `doc/`.
+
+* `CUTS.md`, description of the particle identification cuts.
+
+* `CORR.md`, description of the corrections that Analyser employs.
+
+* `STATUS.md`, description of the status cuts that are extracted from the `ClasTool` root files.
