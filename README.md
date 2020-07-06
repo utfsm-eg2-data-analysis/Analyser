@@ -1,6 +1,6 @@
 # Analyser
 
-Analysis tool, developed by Hayk Hakobyan, that filters "ClasTool-formatted" .root files.
+Analysis tool, developed by Hayk Hakobyan, that filters *ClasTool-formatted* root files.
 
 It includes the C++ class **TIdentificator**, which is in charge of the particle identification cuts.
 
@@ -10,13 +10,15 @@ It includes the C++ class **TIdentificator**, which is in charge of the particle
 
 * xutils-dev
 
+* **ClasTool**
+
 ### Environment variables
 
 In sumary, you must define the following environment variables:
-* `CLASTOOL` as the current ClasTool directory
-* `CLAS_LIB` as the current clas_lib directory
-* `CLAS_PACK` as the current clas_pack directory
-* `ANALYSER` as the current Analyser directory
+* `CLASTOOL` as the **ClasTool** directory
+* `CLAS_LIB` as the **clas_lib** directory
+* `CLAS_PACK` as the **clas_pack** directory
+* `ANALYSER` as the current **Analyser** directory
 
 These next two variables should have these values:
 ```
@@ -34,7 +36,7 @@ And, also:
 If you're using Bash as your Unix shell, you only need to add the following lines at the end of your `.bashrc` file located in
 your home directory. 
 
-**Note:** here I previously defined another environment variable called `TOPDIR`, which stands for a directory
+**Note:** here it is defined another previous environment variable called `TOPDIR`, which stands for a directory
 where all the related repositories are located.
 ```
 export OS_NAME=`uname`
@@ -56,7 +58,7 @@ source .bashrc
 
 ## Compilation
 
-Compile by running Makefile.
+Compile by running **Makefile**.
 
 ## Integration with ROOT command console
 
@@ -82,7 +84,7 @@ Rint.Logon: ~/rootlogon.C
 
 ### Debug for ROOT
 
-From ROOT v6.14 onwards, it has become necessary to copy all dictionary files into the dynamic libraries folders `slib`.
+From **ROOT v6.14** onwards, it has become necessary to copy all dictionary files into the dynamic libraries folders `slib`.
 To fix the annoying warning message, you should run these commands:
 
 * Inside ClasTool directory, run:
@@ -95,12 +97,12 @@ find . -name *.pcm -exec cp -t ./slib/Linux {} +
 find . -name *.pcm -exec cp -t ./slib {} +
 ```
 
-## Documentation
+## More information
 
 More information can be found inside the directory `doc/`.
 
-* `CUTS.md`, description of the particle identification cuts.
+* `CUTS.md`, description of the current particle identification cuts.
 
-* `CORR.md`, description of the corrections that Analyser employs.
+* `CORR.md`, description of the different corrections that Analyser employs.
 
-* `STATUS.md`, description of the status cuts that are extracted from the `ClasTool` root files.
+* `STATUS.md`, description of the status variables.
