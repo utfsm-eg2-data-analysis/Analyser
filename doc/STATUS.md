@@ -22,6 +22,8 @@ The status extracted by **Analyser** variables are as follows:
 
 * From the **CCPB** bank: `CCStatus`
 
+**It is important to remark that the -1000 value corresponds to the null value.**
+
 ## From the `EVNT` bank
 
 ### `Status`
@@ -54,18 +56,76 @@ The status extracted by **Analyser** variables are as follows:
 
 ### `StatDC`, `StatEC`, `StatSC`, `StatCC`
 
+* **Source**: `Analyser/include/TIdentificator.icc`
+
+* **Definition**:
+
+    These variables are indices or *keys* that allows us to search each corresponding **XXStatus** value.
+
 ## From the `DCPB` bank
 
 ### `DCStatus`
+
+* **Possible values**: {-1000, -1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
+
+* **Source**: `seb/trk_2_dc.F` & `seb/time_tracking.F`
+
+* **Definition**:
+
+    **HB:** hit based tracking, **TB:** time based tracking. 
+
+	* If the hit passed the HB, then `DCStatus = -1`
+
+	* If the hit passed the TB, then `DCStatus = <number of tracks that passed TB>`
 
 ## From the `ECPB` bank
 
 ### `ECStatus`
 
+* **Possible values**: {-1000, X0Y0Z} (where X,Y,Z = integers)
+
+* **Source**: `seb/trk_2_ec.F` & `seb/ec_do_match.F` & `seb/fill_trks.F`
+
+* **Definition**:
+
+	```
+    ECStatus = 10000*<number of hits in WHOLE> + 100*<number of hits in INNER> + 1*<number of hits in OUTER>
+	```
+
 ## From the `SCPB` bank
 
 ### `SCStatus`
 
+* **Possible values**: {-1000, 11, 22, 33}
+
+* **Source**: `seb/read_rbanks.F` & `seb/trk_2_sc.F`
+
+* **Definition**:
+
+	* If only the left phototube status is ok, then `SCStatus = 11`
+	
+	* If only the right phototube status is ok, then `SCStatus = 22`
+		
+	* If both phototubes status are ok, then `SCStatus = 33`
+
 ## From the `CCPB` bank
 
 ### `CCStatus`
+
+* **Possible values**: {-1000, 0XYZ, 1XYZ, 2XYZ} (where X,Y,Z = integers)
+
+* **Source**: `seb/trk_2_cc.F`
+
+* **Definition**:
+
+	```
+    CCStatus = 1000*(1 + <PHY_INDEX>) + 10*<CC segment number>
+	```
+
+	Where,
+	
+	* if the hit is located in left PMT, then `PHY_INDEX = -1`
+	
+	* if the hit is located in right PMT, then `PHY_INDEX = +1`
+	
+	* if the hit is located in both PMT, then `PHY_INDEX = 0`
