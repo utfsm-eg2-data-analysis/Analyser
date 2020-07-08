@@ -1,4 +1,4 @@
-TString TIdentificator::GetCategorization(Int_t k, const char* tt, bool mflag)
+TString TIdentificator::GetCategorization(Int_t k, const char* tt)
 {
     Int_t number_dc = fCT->GetNRows("DCPB");
     Int_t number_cc = fCT->GetNRows("CCPB");
@@ -11,27 +11,25 @@ TString TIdentificator::GetCategorization(Int_t k, const char* tt, bool mflag)
 
     if (number_dc != 0) {
         if (k == 0 &&
-	    Status(0) > 0 && Status(0) < 100 &&
+	    Status(0) > 0 &&
 	    Charge(0) == -1 &&
 	    number_cc != 0 && number_ec != 0 && number_sc != 0 &&
 	    StatCC(0) > 0 && StatSC(0) > 0 &&
 	    StatDC(0) > 0 && StatEC(0) > 0 &&
 	    DCStatus(0) > 0 && SCStatus(0) == 33 &&
-	    ( !mflag || Nphe(0) > (Sector(0)==0||Sector(0)==1)*25 //Added sector dependent cut. osoto_mod.
-	    +(Sector(0)==2)*26 
-	    +(Sector(0)==3)*21
-	     +(Sector(0)==4 || Sector(0)==5 )*28)&&
-	    (mflag || Nphe(0)>25)&& //default hayk cc nphe.
-	    (!mflag || Momentum(0)>0.75)&& // Momentum triger added. osoto_mod.
-	    (!mflag || Ein(0)>0.06)&& // Inner stack energy cut. osoto_mod.
-	    (!mflag || (TimeEC(0)- TimeSC(0) - (PathEC(0)-PathSC(0) )/30) < 5*0.35 )&&// elapsed time between sc and ec (??). osoto_mod.
-	    (!mflag || SampFracCheck(tt))&& //osoto mod
+	    Nphe(0) > (Sector(0)==0||Sector(0)==1)*25+(Sector(0)==2)*26+(Sector(0)==3)*21+(Sector(0)==4||Sector(0)==5)*28 && // sector dependent cut
+	    Momentum(0) > 0.75 && // momentum triger
+	    Ein(0) > 0.06 && // inner stack energy cut
+	    -5*0.35 < (TimeEC(0) - TimeSC(0) - (PathEC(0) - PathSC(0))/30) && // elapsed time between sc and ec
+	    (TimeEC(0) - TimeSC(0) - (PathEC(0) - PathSC(0))/30) < 5*0.35 &&
+	    SampFracCheck(tt) &&
 	    Etot(0) / 0.27 / 1.15 + 0.4 > Momentum(0) &&
 	    Etot(0) / 0.27 / 1.15 - 0.2 < Momentum(0) &&
 	    Ein(0) + Eout(0) > 0.8 * 0.27 * Momentum(0) &&
-	    Ein(0) + Eout(0) < 1.2 * 0.27 * Momentum(0) &&
-	    Eout(0) != 0 && FidCheckCut() == 1)
-            partId = "electron";
+            Ein(0) + Eout(0) < 1.2 * 0.27 * Momentum(0) &&
+	    Eout(0) != 0 &&
+	    FidCheckCut() == 1)
+	  partId = "electron";
 
         if (k > 0) {
             if (Charge(k) == 0 )

@@ -1,5 +1,7 @@
 # Corrections
 
+This document refers to all thecorrection routines that **Analyser** employs.
+
 ## Vertex correction
 
 Vertex correction for electrons.
@@ -48,7 +50,10 @@ if (FidTheta(0) > FidThetaMin() && FidPhi(0) > FidPhiMin() && FidPhi(0) < FidPhi
 
 ## Sampling Fraction cut
 
-For electrons.
+For electrons. There is one for:
+  1. Carbon data
+  2. Iron data
+  3. Lead data
 
 ```
 // strcmp(str1,str2) returns 0 if str1 is equal to str2, very weird function
