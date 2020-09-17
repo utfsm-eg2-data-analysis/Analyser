@@ -532,7 +532,7 @@ inline bool TIdentificator::SampFracCheck(Int_t ke, TString tt) {
     MeanE = kMeanPbPar[s][0] + kMeanPbPar[s][1]*p + kMeanPbPar[s][2]*p*p;
     SigmaE = TMath::Sqrt(kSigmaPbPar[s][0]*kSigmaPbPar[s][0] + kSigmaPbPar[s][1]*kSigmaPbPar[s][1]/p);
   } else if (tt == "Sim") { // borquez_mod, based on TM analysis
-    MeanE = 0.2623 + 0.0089*p + 0.0019*p*p;
+    MeanE = 0.2623 + 0.0089*p - 0.0019*p*p;
     SigmaE = TMath::Sqrt(0.0057*0.0057 + 0.0305*0.0305/p);
   }
   
